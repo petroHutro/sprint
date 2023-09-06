@@ -7,7 +7,7 @@ import (
 
 func HandlerGet(w http.ResponseWriter, r *http.Request) {
 	shortLink := r.URL.String()[1:]
-	if shortLink == "" {
+	if shortLink == "" || len(shortLink) > 10 {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -26,5 +26,5 @@ func HandlerGet(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Location", link)
 	w.WriteHeader(http.StatusTemporaryRedirect)
-	w.Write([]byte{})
+	// w.Write([]byte{})
 }
