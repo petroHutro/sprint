@@ -60,7 +60,7 @@ func Test_requestPost(t *testing.T) {
 			w := httptest.NewRecorder()
 			handlers.HandlerPost(w, r)
 			rez := w.Result()
-
+			defer rez.Body.Close()
 			assert.Equal(t, tt.want.code, rez.StatusCode)
 			assert.Equal(t, tt.want.contentType, rez.Header.Get("Content-Type"))
 

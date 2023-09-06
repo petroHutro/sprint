@@ -59,14 +59,14 @@ func Test_requestGet(t *testing.T) {
 			r := httptest.NewRequest(http.MethodGet, tt.request, nil)
 			w := httptest.NewRecorder()
 			handlers.HandlerGet(w, r)
-			rez := w.Result()
 
+			rez := w.Result()
+			defer rez.Body.Close()
 			assert.Equal(t, tt.want.code, rez.StatusCode)
 			if rez.StatusCode == 307 {
 				assert.Contains(t, rez.Header, "Location")
 			}
 			assert.Equal(t, tt.want.link, rez.Header.Get("Location"))
-
 		})
 	}
 }
