@@ -29,29 +29,5 @@ func HandlerPost(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte(db.DB[string(link)]))
-}
-
-func HandlerGet(w http.ResponseWriter, r *http.Request) {
-	shortLink := r.URL.String()[1:]
-	if shortLink == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	var link string
-	for key, value := range db.DB {
-		if value == shortLink {
-			link = key
-			break
-		}
-	}
-	if link == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	w.Header().Set("Location", link)
-	w.WriteHeader(http.StatusTemporaryRedirect)
-	// w.Write([]byte{})
+	w.Write([]byte(db.DB["http://localhost:8080/"+string(link)]))
 }
