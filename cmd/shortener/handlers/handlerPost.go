@@ -14,6 +14,7 @@ func HandlerPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	defer r.Body.Close()
 	link, err := io.ReadAll(r.Body)
 	if err != nil || len(link) == 0 {
 		w.WriteHeader(http.StatusBadRequest)
