@@ -6,7 +6,7 @@ import (
 )
 
 func HandlerGet(w http.ResponseWriter, r *http.Request) {
-	shortLink := r.URL.Path[1:]
+	shortLink := r.URL.String()[1:]
 	if shortLink == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		return
