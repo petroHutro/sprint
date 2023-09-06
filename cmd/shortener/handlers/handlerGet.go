@@ -1,30 +1,30 @@
 package handlers
 
-import (
-	"net/http"
-	"sprint/cmd/shortener/db"
-)
+// import (
+// 	"net/http"
+// 	"sprint/cmd/shortener/db"
+// )
 
-func HandlerGet(w http.ResponseWriter, r *http.Request) {
-	shortLink := r.URL.String()[1:]
-	if shortLink == "" || len(shortLink) > 10 {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
+// func HandlerGet(w http.ResponseWriter, r *http.Request) {
+// 	shortLink := r.URL.String()[1:]
+// 	if shortLink == "" {
+// 		w.WriteHeader(http.StatusBadRequest)
+// 		return
+// 	}
 
-	var link string
-	for key, value := range db.DB {
-		if value == shortLink {
-			link = key
-			break
-		}
-	}
-	if link == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
+// 	var link string
+// 	for key, value := range db.DB {
+// 		if value == shortLink {
+// 			link = key
+// 			break
+// 		}
+// 	}
+// 	if link == "" {
+// 		w.WriteHeader(http.StatusBadRequest)
+// 		return
+// 	}
 
-	w.Header().Set("Location", link)
-	w.WriteHeader(http.StatusTemporaryRedirect)
-	// w.Write([]byte{})
-}
+// 	w.Header().Set("Location", link)
+// 	w.WriteHeader(http.StatusTemporaryRedirect)
+// 	// w.Write([]byte{})
+// }
