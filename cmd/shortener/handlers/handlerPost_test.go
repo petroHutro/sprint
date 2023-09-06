@@ -32,7 +32,7 @@ func Test_requestPost(t *testing.T) {
 			request: request{
 				url:         "/",
 				body:        "https://www.google.com/",
-				contentType: "text/plain",
+				contentType: "text/plain; charset=utf-8",
 			},
 			want: want{
 				code:        201,
