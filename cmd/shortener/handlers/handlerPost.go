@@ -29,5 +29,5 @@ func HandlerPost(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte(db.DB["http://localhost:8080/"+string(link)]))
+	w.Write([]byte("http://localhost:8080/" + db.DB[string(link)]))
 }
