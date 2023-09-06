@@ -9,7 +9,7 @@ import (
 
 func HandlerPost(w http.ResponseWriter, r *http.Request) {
 	//пределать это условие с учетом всех text/plain
-	if r.URL.Path != "/" || (r.Header.Get("Content-Type") != "text/plain" || r.Header.Get("Content-Type") != "text/plain; charset=utf-8") {
+	if r.URL.Path != "/" || r.Header.Get("Content-Type") != "text/plain; charset=utf-8" {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
