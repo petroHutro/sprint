@@ -21,6 +21,7 @@ func HandlerPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//возможно пересмотреть порядок
 	if _, ok := db.DB[string(link)]; !ok {
 		shortLink := utils.LinkShortening()
 		db.DB[string(link)] = shortLink
