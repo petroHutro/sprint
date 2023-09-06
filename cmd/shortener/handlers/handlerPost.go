@@ -19,12 +19,12 @@ func HandlerPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, ok := db.Db[string(link)]; !ok {
+	if _, ok := db.DB[string(link)]; !ok {
 		shortLink := utils.LinkShortening()
-		db.Db[string(link)] = shortLink
+		db.DB[string(link)] = shortLink
 	}
 
 	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte(db.Db[string(link)]))
+	w.Write([]byte(db.DB[string(link)]))
 }

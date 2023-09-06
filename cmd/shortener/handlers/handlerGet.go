@@ -13,7 +13,7 @@ func HandlerGet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var link string
-	for key, value := range db.Db {
+	for key, value := range db.DB {
 		if value == shortLink {
 			link = key
 		}
