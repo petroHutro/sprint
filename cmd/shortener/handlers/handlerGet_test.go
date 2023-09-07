@@ -26,10 +26,10 @@ func Test_requestGet(t *testing.T) {
 			name:      "GET#1 Test",
 			request:   "/19",
 			shortLink: "19",
-			link:      "123456789",
+			link:      "http://localhost:8080/123456789",
 			want: want{
 				code: 307,
-				link: "123456789",
+				link: "http://localhost:8080/123456789",
 			},
 		},
 		{
