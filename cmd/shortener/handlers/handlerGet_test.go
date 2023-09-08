@@ -55,7 +55,7 @@ func Test_requestGet(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			db.SetDb(tt.want.link, tt.shortLink)
+			db.SetDB(tt.want.link, tt.shortLink)
 			r := httptest.NewRequest(http.MethodGet, tt.request, nil)
 			w := httptest.NewRecorder()
 			handlers.HandlerGet(w, r)

@@ -24,6 +24,6 @@ func HandlerPost(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	domain := fmt.Sprintf("http://%s/", r.Host)
 	// w.Write([]byte(domain + db.DB[string(link)]))
-	w.Write([]byte(domain + db.GetDb(string(link))))
+	w.Write([]byte(domain + db.GetDB(string(link))))
 
 }
