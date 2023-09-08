@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"sprint/cmd/shortener/db"
@@ -8,26 +9,21 @@ import (
 )
 
 func HandlerPost(w http.ResponseWriter, r *http.Request) {
-	//пределать это условие с учетом всех text/plain
-	if r.URL.Path != "/" || r.Header.Get("Content-Type") != "text/plain; charset=utf-8" {
+	if r.URL.Path != "/" || !utils.ValidContentType(r.Header.Get("Content-Type")) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-
 	defer r.Body.Close()
 	link, err := io.ReadAll(r.Body)
 	if err != nil || len(link) == 0 {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-
-	//возможно пересмотреть порядок
-	if _, ok := db.DB[string(link)]; !ok {
-		shortLink := utils.LinkShortening()
-		db.DB[string(link)] = shortLink
-	}
-
+	db.LongToShort(string(link))
 	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte("http://localhost:8080/" + db.DB[string(link)]))
+	domain := fmt.Sprintf("http://%s/", r.Host)
+	// w.Write([]byte(domain + db.DB[string(link)]))
+	w.Write([]byte(domain + db.GetDb(string(link))))
+
 }
