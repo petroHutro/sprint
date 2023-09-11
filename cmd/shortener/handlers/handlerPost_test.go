@@ -4,6 +4,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"sprint/cmd/shortener/config"
 	"sprint/cmd/shortener/handlers"
 	"strings"
 	"testing"
@@ -54,11 +55,12 @@ func Test_requestPost(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			flags := config.NewFlags()
 			body := strings.NewReader(tt.body)
 			r := httptest.NewRequest(http.MethodPost, tt.url, body)
 			r.Header.Set("Content-Type", tt.contentType)
 			w := httptest.NewRecorder()
-			handlers.HandlerPost(w, r)
+			handlers.HandlerPost(w, r, &flags)
 			rez := w.Result()
 			defer rez.Body.Close()
 			assert.Equal(t, tt.want.code, rez.StatusCode)

@@ -1,12 +1,12 @@
 package utils
 
 import (
+	"errors"
 	"strings"
 )
 
-func ValidContentType(str string) bool {
+func ValidContentType(str string) error {
 	contentType := strings.Split(str, "; ")
-
 	if len(contentType) > 0 && contentType[0] == "text/plain" {
 		if len(contentType) == 2 {
 			validCharsets := map[string]bool{
@@ -16,11 +16,11 @@ func ValidContentType(str string) bool {
 				"charset=windows-1251": true,
 			}
 			if validCharsets[contentType[1]] {
-				return true
+				return nil
 			}
 		} else if len(contentType) == 1 {
-			return true
+			return nil
 		}
 	}
-	return false
+	return errors.New("wrong fornat Content Type")
 }

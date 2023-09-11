@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
+	"sprint/cmd/shortener/config"
 	"sprint/cmd/shortener/handlers"
+	"strconv"
 
-	// "github.com/gorilla/mux"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -15,17 +17,17 @@ func main() {
 }
 
 func run() error {
+	flags := config.ParseFlags()
 	r := chi.NewRouter()
-
 	r.Route("/", func(r chi.Router) {
-		r.Post("/", handlers.HandlerPost)
+		r.Post("/", func(w http.ResponseWriter, r *http.Request) {
+			handlers.HandlerPost(w, r, flags)
+		})
 	})
 	r.Route("/{id:[a-zA-Z0-9]+}", func(r chi.Router) {
 		r.Get("/", handlers.HandlerGet)
 	})
-
-	// r := mux.NewRouter()
-	// r.HandleFunc("/", handlers.HandlerPost).Methods("POST")
-	// r.HandleFunc("/{id:[a-zA-Z0-9]+}", handlers.HandlerGet).Methods("GET")
-	return http.ListenAndServe(`:8080`, r)
+	fmt.Println(flags.Host+strconv.Itoa(flags.Port), flags.Port, flags.BaseUrl)
+	adress := flags.Host + strconv.Itoa(flags.Port)
+	return http.ListenAndServe(adress, r)
 }

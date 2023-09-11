@@ -1,6 +1,8 @@
 package db
 
-func ShortToLong(shortLink string) (string, bool) {
+import "errors"
+
+func ShortToLong(shortLink string) (string, error) {
 	var link string
 	for key, value := range db {
 		if value == shortLink {
@@ -9,8 +11,7 @@ func ShortToLong(shortLink string) (string, bool) {
 		}
 	}
 	if link == "" {
-		return "", true
+		return "", errors.New("no short link")
 	}
-
-	return link, false
+	return link, nil
 }

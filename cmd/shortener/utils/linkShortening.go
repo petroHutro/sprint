@@ -10,9 +10,6 @@ const (
 )
 
 func LinkShortening() string {
-	// source := rand.NewSource(time.Now().UnixNano())
-	// generator := rand.New(source)
-	// number := uint64(generator.Intn(9223372036854775807))
 	number := rand.Uint64()
 	length := len(alphabet)
 	var encodedBuilder strings.Builder

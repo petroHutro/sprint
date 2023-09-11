@@ -12,7 +12,7 @@ func HandlerGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	link, err := db.ShortToLong(shortLink)
-	if err {
+	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
