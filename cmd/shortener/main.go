@@ -16,6 +16,6 @@ func main() {
 func run() error {
 	flags := config.ConfigureServer()
 	r := router.Router(flags)
-	adress := flags.Host + ":" + strconv.Itoa(flags.Port)
-	return http.ListenAndServe(adress, r)
+	address := flags.Host + ":" + strconv.Itoa(flags.Port)
+	return http.ListenAndServe(address, r)
 }
