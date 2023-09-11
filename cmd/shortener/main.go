@@ -16,7 +16,7 @@ func main() {
 }
 
 func run() error {
-	flags := config.ParseFlags()
+	flags := config.ConfigureServer()
 	r := chi.NewRouter()
 	r.Route("/", func(r chi.Router) {
 		r.Post("/", func(w http.ResponseWriter, r *http.Request) {

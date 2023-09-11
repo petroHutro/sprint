@@ -3,6 +3,7 @@ package config
 import (
 	"errors"
 	"flag"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -26,6 +27,21 @@ func NewFlags() Flags {
 			Host: "localhost",
 			Port: 8080,
 		},
+	}
+}
+
+func ConfigureServer() *Flags {
+	flags := ParseFlags()
+	ParseENV(flags)
+	return flags
+}
+
+func ParseENV(flags *Flags) {
+	if serverAddress := os.Getenv("SERVER_ADDRESS"); serverAddress != "" {
+		flags.NetAddress.Set(serverAddress)
+	}
+	if baseURL := os.Getenv("BASE_URL"); baseURL != "" {
+		flags.BaseURL.Set(baseURL)
 	}
 }
 
