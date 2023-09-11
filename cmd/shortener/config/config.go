@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-type BaseUrl string
+type BaseURL string
 
 type NetAddress struct {
 	Host string
@@ -15,13 +15,13 @@ type NetAddress struct {
 }
 
 type Flags struct {
-	BaseUrl
+	BaseURL
 	NetAddress
 }
 
 func NewFlags() Flags {
 	return Flags{
-		BaseUrl: "http://localhost:8080",
+		BaseURL: "http://localhost:8080",
 		NetAddress: NetAddress{
 			Host: "localhost",
 			Port: 8080,
@@ -32,17 +32,17 @@ func NewFlags() Flags {
 func ParseFlags() *Flags {
 	flags := NewFlags()
 	flag.Var(&flags.NetAddress, "a", "address and port to run server")
-	flag.Var(&flags.BaseUrl, "b", "BaseUrl")
+	flag.Var(&flags.BaseURL, "b", "BaseUrl")
 	flag.Parse()
 	return &flags
 }
 
-func (a BaseUrl) String() string {
+func (a BaseURL) String() string {
 	return string(a)
 }
 
-func (a *BaseUrl) Set(s string) error {
-	*a = BaseUrl(s)
+func (a *BaseURL) Set(s string) error {
+	*a = BaseURL(s)
 	return nil
 }
 
