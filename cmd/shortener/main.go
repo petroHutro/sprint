@@ -2,11 +2,9 @@ package main
 
 import (
 	"net/http"
-	"sprint/cmd/shortener/config"
-	"sprint/cmd/shortener/handlers"
+	"sprint/internal/app/config"
+	"sprint/internal/app/router"
 	"strconv"
-
-	"github.com/go-chi/chi/v5"
 )
 
 func main() {
@@ -17,16 +15,7 @@ func main() {
 
 func run() error {
 	flags := config.ConfigureServer()
-	r := chi.NewRouter()
-	r.Route("/", func(r chi.Router) {
-		r.Post("/", func(w http.ResponseWriter, r *http.Request) {
-			handlers.HandlerPost(w, r, flags)
-		})
-	})
-	r.Route("/{id:[a-zA-Z0-9]+}", func(r chi.Router) {
-		r.Get("/", handlers.HandlerGet)
-	})
-	// fmt.Println(flags.Host+":"+strconv.Itoa(flags.Port), flags.Port, flags.BaseURL)
+	r := router.Router(flags)
 	adress := flags.Host + ":" + strconv.Itoa(flags.Port)
 	return http.ListenAndServe(adress, r)
 }

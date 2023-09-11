@@ -31,12 +31,12 @@ func NewFlags() Flags {
 }
 
 func ConfigureServer() *Flags {
-	flags := ParseFlags()
-	ParseENV(flags)
+	flags := parseFlags()
+	parseENV(flags)
 	return flags
 }
 
-func ParseENV(flags *Flags) {
+func parseENV(flags *Flags) {
 	if serverAddress := os.Getenv("SERVER_ADDRESS"); serverAddress != "" {
 		flags.NetAddress.Set(serverAddress)
 	}
@@ -45,7 +45,7 @@ func ParseENV(flags *Flags) {
 	}
 }
 
-func ParseFlags() *Flags {
+func parseFlags() *Flags {
 	flags := NewFlags()
 	flag.Var(&flags.NetAddress, "a", "address and port to run server")
 	flag.Var(&flags.BaseURL, "b", "BaseUrl")

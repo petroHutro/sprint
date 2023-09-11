@@ -4,8 +4,8 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"sprint/cmd/shortener/config"
-	"sprint/cmd/shortener/handlers"
+	"sprint/internal/app/config"
+	"sprint/internal/app/handlers"
 	"strings"
 	"testing"
 

@@ -3,8 +3,8 @@ package handlers_test
 import (
 	"net/http"
 	"net/http/httptest"
-	"sprint/cmd/shortener/db"
-	"sprint/cmd/shortener/handlers"
+	"sprint/internal/app/handlers"
+	"sprint/internal/app/storage"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -55,7 +55,7 @@ func Test_requestGet(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			db.SetDB(tt.want.link, tt.shortLink)
+			storage.SetDB(tt.want.link, tt.shortLink)
 			r := httptest.NewRequest(http.MethodGet, tt.request, nil)
 			w := httptest.NewRecorder()
 			handlers.HandlerGet(w, r)

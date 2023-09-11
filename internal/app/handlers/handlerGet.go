@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"net/http"
-	"sprint/cmd/shortener/db"
+	"sprint/internal/app/storage"
 )
 
 func HandlerGet(w http.ResponseWriter, r *http.Request) {
@@ -11,7 +11,7 @@ func HandlerGet(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	link, err := db.ShortToLong(shortLink)
+	link, err := storage.ShortToLong(shortLink)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return

@@ -3,9 +3,9 @@ package handlers
 import (
 	"io"
 	"net/http"
-	"sprint/cmd/shortener/config"
-	"sprint/cmd/shortener/db"
-	"sprint/cmd/shortener/utils"
+	"sprint/internal/app/config"
+	"sprint/internal/app/storage"
+	"sprint/internal/app/utils"
 )
 
 func HandlerPost(w http.ResponseWriter, r *http.Request, flag *config.Flags) {
@@ -19,10 +19,10 @@ func HandlerPost(w http.ResponseWriter, r *http.Request, flag *config.Flags) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	db.LongToShort(string(link))
+	storage.LongToShort(string(link))
 	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusCreated)
 	baseAdress := string(flag.BaseURL)
-	w.Write([]byte(baseAdress + "/" + db.GetDB(string(link))))
+	w.Write([]byte(baseAdress + "/" + storage.GetDB(string(link))))
 
 }
