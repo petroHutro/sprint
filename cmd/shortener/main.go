@@ -26,7 +26,7 @@ func run() error {
 	r.Route("/{id:[a-zA-Z0-9]+}", func(r chi.Router) {
 		r.Get("/", handlers.HandlerGet)
 	})
-	// fmt.Println(flags.Host+strconv.Itoa(flags.Port), flags.Port, flags.BaseURL)
-	adress := flags.Host + strconv.Itoa(flags.Port)
+	// fmt.Println(flags.Host+":"+strconv.Itoa(flags.Port), flags.Port, flags.BaseURL)
+	adress := flags.Host + ":" + strconv.Itoa(flags.Port)
 	return http.ListenAndServe(adress, r)
 }
