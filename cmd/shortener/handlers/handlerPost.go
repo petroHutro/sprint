@@ -23,6 +23,6 @@ func HandlerPost(w http.ResponseWriter, r *http.Request, flag *config.Flags) {
 	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusCreated)
 	baseAdress := string(flag.BaseURL)
-	w.Write([]byte(baseAdress + db.GetDB(string(link))))
+	w.Write([]byte(baseAdress + "/" + db.GetDB(string(link))))
 
 }

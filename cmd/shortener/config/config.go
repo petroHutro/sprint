@@ -21,7 +21,7 @@ type Flags struct {
 
 func NewFlags() Flags {
 	return Flags{
-		BaseURL: "http://localhost:8080/",
+		BaseURL: "http://localhost:8080",
 		NetAddress: NetAddress{
 			Host: "localhost",
 			Port: 8080,
