@@ -2,8 +2,8 @@ package main
 
 import (
 	"net/http"
-	"sprint/internal/app/config"
-	"sprint/internal/app/router"
+	"sprint/internal/config"
+	"sprint/internal/router"
 	"strconv"
 )
 

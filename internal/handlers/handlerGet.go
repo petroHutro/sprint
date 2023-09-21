@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"net/http"
-	"sprint/internal/app/storage"
+	"sprint/internal/storage"
 )
 
 func HandlerGet(w http.ResponseWriter, r *http.Request) {

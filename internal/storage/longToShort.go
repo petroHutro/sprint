@@ -1,7 +1,7 @@
 package storage
 
 import (
-	"sprint/internal/app/utils"
+	"sprint/internal/utils"
 )
 
 func LongToShort(link string) {

@@ -4,8 +4,8 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"sprint/internal/app/config"
-	"sprint/internal/app/handlers"
+	"sprint/internal/config"
+	"sprint/internal/handlers"
 	"strings"
 	"testing"
 
@@ -60,7 +60,7 @@ func Test_requestPost(t *testing.T) {
 			r := httptest.NewRequest(http.MethodPost, tt.url, body)
 			r.Header.Set("Content-Type", tt.contentType)
 			w := httptest.NewRecorder()
-			handlers.HandlerPost(w, r, &flags)
+			handlers.HandlerPost(w, r, string(flags.BaseURL))
 			rez := w.Result()
 			defer rez.Body.Close()
 			assert.Equal(t, tt.want.code, rez.StatusCode)

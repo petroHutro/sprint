@@ -3,8 +3,8 @@ package handlers_test
 import (
 	"net/http"
 	"net/http/httptest"
-	"sprint/internal/app/handlers"
-	"sprint/internal/app/storage"
+	"sprint/internal/handlers"
+	"sprint/internal/storage"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
