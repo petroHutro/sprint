@@ -7,11 +7,12 @@ import (
 	"sprint/internal/logger"
 
 	"github.com/go-chi/chi/v5"
+	"go.uber.org/zap"
 )
 
-func Router(flags *config.Flags) *chi.Mux {
+func Router(flags *config.Flags, log *zap.Logger) *chi.Mux {
 	r := chi.NewRouter()
-	r.Use(logger.WithLogging)
+	r.Use(logger.LoggingMiddleware(log))
 	r.Route("/", func(r chi.Router) {
 		r.Post("/", func(w http.ResponseWriter, r *http.Request) {
 			handlers.HandlerPost(w, r, string(flags.BaseURL))
