@@ -21,5 +21,10 @@ func Router(flags *config.Flags, log *zap.Logger) *chi.Mux {
 	r.Route("/{id:[a-zA-Z0-9]+}", func(r chi.Router) {
 		r.Get("/", handlers.HandlerGet)
 	})
+	r.Route("/api", func(r chi.Router) {
+		r.Post("/shorten", func(w http.ResponseWriter, r *http.Request) {
+			handlers.HandlerPostApi(w, r, string(flags.BaseURL))
+		})
+	})
 	return r
 }

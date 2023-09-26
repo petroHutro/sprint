@@ -5,9 +5,9 @@ import (
 	"strings"
 )
 
-func ValidContentType(str string) error {
+func ValidContentType(str, valid string) error {
 	contentType := strings.Split(str, "; ")
-	if len(contentType) > 0 && contentType[0] == "text/plain" {
+	if len(contentType) > 0 && contentType[0] == valid {
 		if len(contentType) == 2 {
 			validCharsets := map[string]bool{
 				"charset=utf-8":        true,
