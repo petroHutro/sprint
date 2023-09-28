@@ -16,7 +16,7 @@ type DataResp struct {
 	Result string `json:"result"`
 }
 
-func HandlerPostApi(w http.ResponseWriter, r *http.Request, baseAddress string) {
+func HandlerPostAPI(w http.ResponseWriter, r *http.Request, baseAddress string) {
 	if r.URL.Path != "/api/shorten" || utils.ValidContentType(r.Header.Get("Content-Type"), "application/json") != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return

@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestHandlerPostApi(t *testing.T) {
+func TestHandlerPostAPI(t *testing.T) {
 	type request struct {
 		url         string
 		body        string
@@ -97,7 +97,7 @@ func TestHandlerPostApi(t *testing.T) {
 			r.Header.Set("Content-Type", tt.contentType)
 			w := httptest.NewRecorder()
 
-			handlers.HandlerPostApi(w, r, string(flags.BaseURL))
+			handlers.HandlerPostAPI(w, r, string(flags.BaseURL))
 
 			rez := w.Result()
 			defer rez.Body.Close()
