@@ -10,6 +10,12 @@ import (
 
 type BaseURL string
 
+type Logger struct {
+	FilePath  string
+	FileFlag  bool
+	MultiFlag bool
+}
+
 type NetAddress struct {
 	Host string
 	Port int
@@ -18,6 +24,7 @@ type NetAddress struct {
 type Flags struct {
 	BaseURL
 	NetAddress
+	Logger
 }
 
 func NewFlags() Flags {
@@ -26,6 +33,11 @@ func NewFlags() Flags {
 		NetAddress: NetAddress{
 			Host: "localhost",
 			Port: 8080,
+		},
+		Logger: Logger{
+			FilePath:  "file.log",
+			FileFlag:  false,
+			MultiFlag: false,
 		},
 	}
 }
@@ -43,12 +55,17 @@ func parseENV(flags *Flags) {
 	if baseURL := os.Getenv("BASE_URL"); baseURL != "" {
 		flags.BaseURL.Set(baseURL)
 	}
+	if file := os.Getenv("LOGGER_FILE"); file != "" {
+		flags.FilePath = file
+	}
 }
 
 func parseFlags() *Flags {
 	flags := NewFlags()
 	flag.Var(&flags.NetAddress, "a", "address and port to run server")
 	flag.Var(&flags.BaseURL, "b", "BaseUrl")
+	flag.BoolVar(&flags.Logger.FileFlag, "l", false, "Logger only file")
+	flag.BoolVar(&flags.Logger.MultiFlag, "L", false, "Logger Multi")
 	flag.Parse()
 	return &flags
 }

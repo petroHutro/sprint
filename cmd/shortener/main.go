@@ -11,21 +11,20 @@ import (
 )
 
 func main() {
-	fileLogger, err := logger.NewFileLogger("app.log")
-	if err != nil {
-		panic(err)
-	}
-	defer logger.CloseFileLoger(fileLogger)
-	multiLogger := logger.CreateMultiLogger(fileLogger)
-	multiLogger.Info("Running server", zap.String("address", "local"))
-	if err := run(multiLogger); err != nil {
+	if err := run(); err != nil {
 		panic(err)
 	}
 }
 
-func run(loggers *zap.Logger) error {
+func run() error {
 	flags := config.ConfigureServer()
-	r := router.Router(flags, loggers)
+	log, err := logger.NewLogger(flags.Logger)
+	if err != nil {
+		panic(err)
+	}
+	defer logger.CloseFileLoger(log)
+	log.Info("Running server", zap.String("address", "local"))
+	r := router.Router(flags, log)
 	address := flags.Host + ":" + strconv.Itoa(flags.Port)
 	return http.ListenAndServe(address, r)
 }
