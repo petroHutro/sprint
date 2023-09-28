@@ -31,10 +31,8 @@ func TestHandlerPostApi(t *testing.T) {
 		{
 			name: "POST#1 Test",
 			request: request{
-				url: "/api/shorten",
-				body: `{
-							"url": "https://practicum.yandex.ru"
-				  		}`,
+				url:         "/api/shorten",
+				body:        `{"url": "https://practicum.yandex.ru"}`,
 				contentType: "application/json",
 			},
 			want: want{
@@ -47,6 +45,42 @@ func TestHandlerPostApi(t *testing.T) {
 			request: request{
 				url:         "/api/shorten",
 				body:        "",
+				contentType: "application/json",
+			},
+			want: want{
+				code:        400,
+				contentType: "",
+			},
+		},
+		{
+			name: "POST#3 Test",
+			request: request{
+				url:         "/api/shorten",
+				body:        `{"url": "https://practicum.yandex.ru"}`,
+				contentType: "text/plain",
+			},
+			want: want{
+				code:        400,
+				contentType: "",
+			},
+		},
+		{
+			name: "POST#4 Test",
+			request: request{
+				url:         "/api",
+				body:        `{"url": "https://practicum.yandex.ru"}`,
+				contentType: "application/json",
+			},
+			want: want{
+				code:        400,
+				contentType: "",
+			},
+		},
+		{
+			name: "POST#5 Test",
+			request: request{
+				url:         "/api/shorten",
+				body:        `{"gg": "https://practicum.yandex23.ru"}`,
 				contentType: "application/json",
 			},
 			want: want{

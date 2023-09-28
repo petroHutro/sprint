@@ -9,11 +9,11 @@ import (
 )
 
 type DataReq struct {
-	Url string `json:"url,omitempty"`
+	URL string `json:"url"`
 }
 
 type DataResp struct {
-	Result string `json:"result,omitempty"`
+	Result string `json:"result"`
 }
 
 func HandlerPostApi(w http.ResponseWriter, r *http.Request, baseAddress string) {
@@ -25,7 +25,8 @@ func HandlerPostApi(w http.ResponseWriter, r *http.Request, baseAddress string) 
 	var data DataReq
 	_, err := buf.ReadFrom(r.Body)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		// http.Error(w, err.Error(), http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	if err = json.Unmarshal(buf.Bytes(), &data); err != nil {
@@ -33,8 +34,13 @@ func HandlerPostApi(w http.ResponseWriter, r *http.Request, baseAddress string) 
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	storage.LongToShort(data.Url)
-	var dataResp DataResp = DataResp{Result: baseAddress + "/" + storage.GetDB(string(data.Url))}
+	// fmt.Println(data)
+	if data.URL == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	storage.LongToShort(data.URL)
+	var dataResp DataResp = DataResp{Result: baseAddress + "/" + storage.GetDB(string(data.URL))}
 	resp, err := json.Marshal(dataResp)
 	if err != nil {
 		// http.Error(w, err.Error(), http.StatusBadRequest)
