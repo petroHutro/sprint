@@ -2,6 +2,7 @@ package router
 
 import (
 	"net/http"
+	"sprint/internal/compression"
 	"sprint/internal/config"
 	"sprint/internal/handlers"
 	"sprint/internal/logger"
@@ -13,6 +14,7 @@ import (
 func Router(flags *config.Flags, log *zap.Logger) *chi.Mux {
 	r := chi.NewRouter()
 	r.Use(logger.LoggingMiddleware(log))
+	r.Use(compression.GzipMiddleware)
 	r.Route("/", func(r chi.Router) {
 		r.Post("/", func(w http.ResponseWriter, r *http.Request) {
 			handlers.HandlerPost(w, r, string(flags.BaseURL))
