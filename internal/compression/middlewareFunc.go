@@ -108,7 +108,7 @@ func GzipMiddleware(next http.Handler) http.Handler {
 			}
 			// меняем тело запроса на новое
 			r.Body = cr
-			w.Header().Set("Content-Type", "text/plain")
+			w.Header().Set("Content-Type", "application/json")
 			defer cr.Close()
 		}
 		// }
