@@ -9,13 +9,13 @@ import (
 
 func HandlerPost(w http.ResponseWriter, r *http.Request, baseAddress string) {
 	if r.URL.Path != "/" || utils.ValidContentType(r.Header.Get("Content-Type"), "text/plain") != nil {
-		w.WriteHeader(http.StatusUnauthorized)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	defer r.Body.Close()
 	link, err := io.ReadAll(r.Body)
 	if err != nil || len(link) == 0 {
-		w.WriteHeader(http.StatusPaymentRequired)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	storage.LongToShort(string(link))
