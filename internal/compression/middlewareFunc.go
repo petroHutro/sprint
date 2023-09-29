@@ -82,7 +82,6 @@ func GzipMiddleware(next http.Handler) http.Handler {
 		// по умолчанию устанавливаем оригинальный http.ResponseWriter как тот,
 		// который будем передавать следующей функции
 		ow := w
-
 		contentType := r.Header.Get("Content-Type")
 		if contentType == "application/json" || contentType == "text/html" {
 			// проверяем, что клиент умеет получать от сервера сжатые данные в формате gzip
