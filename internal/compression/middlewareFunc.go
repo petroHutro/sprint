@@ -1,7 +1,10 @@
 package compression
 
 import (
+	"bytes"
 	"compress/gzip"
+	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -95,7 +98,6 @@ func GzipMiddleware(next http.Handler) http.Handler {
 			// не забываем отправить клиенту все сжатые данные после завершения middleware
 			defer cw.Close()
 		}
-
 		// проверяем, что клиент отправил серверу сжатые данные в формате gzip
 		contentEncoding := r.Header.Get("Content-Encoding")
 		sendsGzip := strings.Contains(contentEncoding, "gzip")
@@ -103,16 +105,43 @@ func GzipMiddleware(next http.Handler) http.Handler {
 			// оборачиваем тело запроса в io.Reader с поддержкой декомпрессии
 			cr, err := newCompressReader(r.Body)
 			if err != nil {
+				fmt.Println("00000!@#$%^&!@#$%^&")
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
-			// меняем тело запроса на новое
-			r.Body = cr
-			// w.Header().Set("Content-Type", "application/json")
+			data, err := io.ReadAll(cr)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			r.Body = io.NopCloser(bytes.NewReader(data))
+			if isJSON(data) {
+				r.Header.Set("Content-Type", "application/json")
+			} else if isText(data) {
+				r.Header.Set("Content-Type", "text/plain")
+			}
 			defer cr.Close()
 		}
 		// }
 		// передаём управление хендлеру
 		next.ServeHTTP(ow, r)
 	})
+}
+
+func isJSON(data []byte) bool {
+	var js interface{}
+	if err := json.Unmarshal(data, &js); err == nil {
+		return true
+	}
+	return false
+}
+
+func isText(data []byte) bool {
+	controlChars := "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x0B\x0C\x0E\x0F\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F"
+	for _, char := range controlChars {
+		if bytes.IndexByte(data, byte(char)) != -1 {
+			return false
+		}
+	}
+	return true
 }
