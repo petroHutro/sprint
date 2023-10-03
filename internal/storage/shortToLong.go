@@ -3,6 +3,8 @@ package storage
 import "errors"
 
 func ShortToLong(shortLink string) (string, error) {
+	sm.Lock()
+	defer sm.Unlock()
 	var link string
 	for key, value := range db {
 		if value == shortLink {
