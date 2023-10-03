@@ -13,8 +13,7 @@ type URL struct {
 	ShortURL string `json:"short"`
 }
 
-func saveURL(long, short string) error {
-	fname := "test.json"
+func saveURL(long, short, fname string) error {
 	file, err := os.OpenFile(fname, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		return err
@@ -49,10 +48,10 @@ func LoadURL(fname string) error {
 	return nil
 }
 
-func LongToShort(link string) {
+func LongToShort(link, fname string) {
 	if err := GetDB(string(link)); err == "" {
 		shortLink := utils.LinkShortening()
 		SetDB(string(link), shortLink)
-		saveURL(string(link), shortLink)
+		saveURL(string(link), shortLink, fname)
 	}
 }

@@ -18,7 +18,7 @@ func HandlerPost(w http.ResponseWriter, r *http.Request, baseAddress, file strin
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	storage.LongToShort(string(link))
+	storage.LongToShort(string(link), file)
 	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte(baseAddress + "/" + storage.GetDB(string(link))))

@@ -39,7 +39,7 @@ func HandlerPostAPI(w http.ResponseWriter, r *http.Request, baseAddress, file st
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	storage.LongToShort(data.URL)
+	storage.LongToShort(data.URL, file)
 	dataResp := DataResp{Result: baseAddress + "/" + storage.GetDB(string(data.URL))}
 	resp, err := json.Marshal(dataResp)
 	if err != nil {
