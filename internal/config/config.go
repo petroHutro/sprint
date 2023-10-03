@@ -10,6 +10,8 @@ import (
 
 type BaseURL string
 
+type FileStoragePath string
+
 type Logger struct {
 	FilePath  string
 	FileFlag  bool
@@ -25,6 +27,7 @@ type Flags struct {
 	BaseURL
 	NetAddress
 	Logger
+	FileStoragePath
 }
 
 func NewFlags() Flags {
@@ -39,6 +42,7 @@ func NewFlags() Flags {
 			FileFlag:  false,
 			MultiFlag: false,
 		},
+		FileStoragePath: "/tmp/short-url-db.json",
 	}
 }
 
@@ -55,8 +59,11 @@ func parseENV(flags *Flags) {
 	if baseURL := os.Getenv("BASE_URL"); baseURL != "" {
 		flags.BaseURL.Set(baseURL)
 	}
-	if file := os.Getenv("LOGGER_FILE"); file != "" {
-		flags.FilePath = file
+	if fileLoggerPath := os.Getenv("LOGGER_FILE"); fileLoggerPath != "" {
+		flags.FilePath = fileLoggerPath
+	}
+	if fileStoragePath := os.Getenv("FILE_STORAGE_PATH"); fileStoragePath != "" {
+		flags.FileStoragePath.Set(fileStoragePath)
 	}
 }
 
@@ -64,6 +71,7 @@ func parseFlags() *Flags {
 	flags := NewFlags()
 	flag.Var(&flags.NetAddress, "a", "address and port to run server")
 	flag.Var(&flags.BaseURL, "b", "BaseUrl")
+	flag.Var(&flags.FileStoragePath, "f", "FileStoragePath")
 	flag.BoolVar(&flags.Logger.FileFlag, "l", false, "Logger only file")
 	flag.BoolVar(&flags.Logger.MultiFlag, "L", false, "Logger Multi")
 	flag.Parse()
@@ -76,6 +84,15 @@ func (a BaseURL) String() string {
 
 func (a *BaseURL) Set(s string) error {
 	*a = BaseURL(s)
+	return nil
+}
+
+func (a FileStoragePath) String() string {
+	return string(a)
+}
+
+func (a *FileStoragePath) Set(s string) error {
+	*a = FileStoragePath(s)
 	return nil
 }
 

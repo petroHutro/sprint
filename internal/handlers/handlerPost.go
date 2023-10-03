@@ -7,7 +7,7 @@ import (
 	"sprint/internal/utils"
 )
 
-func HandlerPost(w http.ResponseWriter, r *http.Request, baseAddress string) {
+func HandlerPost(w http.ResponseWriter, r *http.Request, baseAddress, file string) {
 	if r.URL.Path != "/" || utils.ValidContentType(r.Header.Get("Content-Type"), "text/plain") != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return

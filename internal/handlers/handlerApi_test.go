@@ -96,7 +96,7 @@ func TestHandlerPostAPI(t *testing.T) {
 			r := httptest.NewRequest(http.MethodPost, tt.url, body)
 			r.Header.Set("Content-Type", tt.contentType)
 			w := httptest.NewRecorder()
-			handlers.HandlerPostAPI(w, r, string(flags.BaseURL))
+			handlers.HandlerPostAPI(w, r, string(flags.BaseURL), "")
 			rez := w.Result()
 			defer rez.Body.Close()
 			assert.Equal(t, tt.want.code, rez.StatusCode)
