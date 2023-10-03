@@ -116,7 +116,7 @@ got status 400
 			r := httptest.NewRequest(http.MethodPost, tt.url, body)
 			r.Header.Set("Content-Type", tt.contentType)
 			w := httptest.NewRecorder()
-			handlers.HandlerPostAPI(w, r, string(flags.BaseURL), "", nil)
+			handlers.HandlerPostAPI(w, r, string(flags.BaseURL), "")
 			rez := w.Result()
 			defer rez.Body.Close()
 			assert.Equal(t, tt.want.code, rez.StatusCode)
