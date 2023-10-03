@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"sprint/internal/config"
 	"sprint/internal/logger"
@@ -13,20 +14,22 @@ import (
 
 func main() {
 	if err := run(); err != nil {
-		panic(err)
+		log.Panic(err.Error())
 	}
 }
 
 func run() error {
 	flags := config.ConfigureServer()
-	log, err := logger.NewLogger(flags.Logger)
+	newLog, err := logger.NewLogger(flags.Logger)
 	if err != nil {
-		panic(err)
+		log.Panic(err.Error())
 	}
-	defer logger.CloseFileLoger(log)
-	storage.LoadURL(string(flags.FileStoragePath))
-	log.Info("Running server", zap.String("address", "local"))
-	r := router.Router(flags, log)
+	defer logger.CloseFileLoger(newLog)
+	if err := storage.LoadURL(string(flags.FileStoragePath)); err != nil {
+		newLog.Panic(err.Error())
+	}
+	r := router.Router(flags, newLog)
 	address := flags.Host + ":" + strconv.Itoa(flags.Port)
+	newLog.Info("Running server", zap.String("address", flags.Host), zap.Int("port", flags.Port))
 	return http.ListenAndServe(address, r)
 }

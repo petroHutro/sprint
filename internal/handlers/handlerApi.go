@@ -25,16 +25,13 @@ func HandlerPostAPI(w http.ResponseWriter, r *http.Request, baseAddress, file st
 	var data DataReq
 	_, err := buf.ReadFrom(r.Body)
 	if err != nil {
-		// http.Error(w, err.Error(), http.StatusBadRequest)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	if err = json.Unmarshal(buf.Bytes(), &data); err != nil {
-		// http.Error(w, err.Error(), http.StatusBadRequest)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	// fmt.Println(data)
 	if data.URL == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -43,7 +40,6 @@ func HandlerPostAPI(w http.ResponseWriter, r *http.Request, baseAddress, file st
 	dataResp := DataResp{Result: baseAddress + "/" + storage.GetDB(string(data.URL))}
 	resp, err := json.Marshal(dataResp)
 	if err != nil {
-		// http.Error(w, err.Error(), http.StatusBadRequest)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}

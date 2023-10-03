@@ -23,7 +23,11 @@ func Test_requestGet(t *testing.T) {
 		want      want
 	}{
 		{
-			name:      "GET#1 Test",
+			name: `
+GET #1
+correct url, correct longLink, correct shortLink
+got status 307
+`,
 			request:   "/19",
 			shortLink: "19",
 			link:      "123456789",
@@ -33,7 +37,11 @@ func Test_requestGet(t *testing.T) {
 			},
 		},
 		{
-			name:      "GET#2 Test",
+			name: `
+GET #2
+emty url, emty longLink, emty shortLink
+got status 400
+`,
 			request:   "/",
 			shortLink: "",
 			link:      "",
@@ -43,7 +51,11 @@ func Test_requestGet(t *testing.T) {
 			},
 		},
 		{
-			name:      "GET#3 Test",
+			name: `
+GET #3
+correct url, not correct longLink, not correct shortLink
+got status 400
+`,
 			request:   "/1234",
 			shortLink: "123",
 			link:      "123",

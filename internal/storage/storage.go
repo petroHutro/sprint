@@ -10,20 +10,22 @@ type URL struct {
 	ShortURL string `json:"short"`
 }
 
-var db map[string]string = make(map[string]string)
+var dbSL map[string]string = make(map[string]string)
+var dbLS map[string]string = make(map[string]string)
 var sm sync.Mutex
 
 func GetDB(key string) string {
 	sm.Lock()
 	defer sm.Unlock()
-	return db[key]
+	return dbLS[key]
 }
 
 func SetDB(key, val string) error {
 	sm.Lock()
 	defer sm.Unlock()
-	if _, ok := db[key]; !ok {
-		db[key] = val
+	if _, ok := dbLS[key]; !ok {
+		dbLS[key] = val
+		dbSL[val] = key
 		return nil
 	}
 	return errors.New("no key in DB")

@@ -29,7 +29,11 @@ func Test_requestPost(t *testing.T) {
 		want want
 	}{
 		{
-			name: "POST#1 Test",
+			name: `
+POST / #1 
+correct url, correct body, correct contentType
+got status 201
+`,
 			request: request{
 				url:         "/",
 				body:        "https://www.google.com/",
@@ -41,11 +45,47 @@ func Test_requestPost(t *testing.T) {
 			},
 		},
 		{
-			name: "POST#2 Test",
+			name: `
+POST / #2 
+correct url, empty body, correct contentType
+got status 400
+`,
 			request: request{
 				url:         "/",
 				body:        "",
+				contentType: "text/plain; charset=utf-8",
+			},
+			want: want{
+				code:        400,
 				contentType: "",
+			},
+		},
+		{
+			name: `
+POST / #3 
+correct url, correct body, empty contentType
+got status 400
+`,
+			request: request{
+				url:         "/",
+				body:        "https://www.google.com/",
+				contentType: "",
+			},
+			want: want{
+				code:        400,
+				contentType: "",
+			},
+		},
+		{
+			name: `
+POST / #4 
+not correct url, correct body, empty contentType
+got status 400
+`,
+			request: request{
+				url:         "/12",
+				body:        "https://www.google.com/",
+				contentType: "text/plain; charset=utf-8",
 			},
 			want: want{
 				code:        400,

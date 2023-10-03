@@ -3,7 +3,6 @@ package logger
 import (
 	"net/http"
 	"sprint/internal/config"
-	"time"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -48,6 +47,8 @@ func newFileLogger(logFile string) (*zap.Logger, error) {
 func newConsoleLogger() (*zap.Logger, error) {
 	config := zap.NewDevelopmentConfig()
 	config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
+	config.EncoderConfig.TimeKey = ""
+	config.EncoderConfig.EncodeCaller = nil
 	logger, _ := config.Build()
 	return logger, nil
 }
@@ -85,30 +86,4 @@ func NewLogger(conf config.Logger) (*zap.Logger, error) {
 		return nil, err
 	}
 	return logger, nil
-}
-
-func LoggingMiddleware(logger *zap.Logger) func(next http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			start := time.Now()
-			responseData := &responseData{
-				status: 0,
-				size:   0,
-			}
-			lw := loggingResponseWriter{
-				ResponseWriter: w,
-				responseData:   responseData,
-			}
-			next.ServeHTTP(&lw, r)
-			duration := time.Since(start)
-			fields := []zap.Field{
-				zap.String("uri", r.RequestURI),
-				zap.String("method", r.Method),
-				zap.Int("status", responseData.status),
-				zap.Duration("duration", duration),
-				zap.Int("size", responseData.size),
-			}
-			logger.Info("Received request", fields...)
-		})
-	}
 }

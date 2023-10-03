@@ -29,7 +29,11 @@ func TestHandlerPostAPI(t *testing.T) {
 		want want
 	}{
 		{
-			name: "POST#1 Test",
+			name: `
+POST /api/shorten #1 
+correct url, correct body, correct contentType
+got status 201
+`,
 			request: request{
 				url:         "/api/shorten",
 				body:        `{"url": "https://practicum.yandex.ru"}`,
@@ -41,7 +45,11 @@ func TestHandlerPostAPI(t *testing.T) {
 			},
 		},
 		{
-			name: "POST#2 Test",
+			name: `
+POST /api/shorten #2 
+correct url, empty body, correct contentType
+got status 400
+`,
 			request: request{
 				url:         "/api/shorten",
 				body:        "",
@@ -53,7 +61,11 @@ func TestHandlerPostAPI(t *testing.T) {
 			},
 		},
 		{
-			name: "POST#3 Test",
+			name: `
+POST /api/shorten #3 
+correct url, correct body, not correct contentType
+got status 400
+`,
 			request: request{
 				url:         "/api/shorten",
 				body:        `{"url": "https://practicum.yandex.ru"}`,
@@ -65,7 +77,11 @@ func TestHandlerPostAPI(t *testing.T) {
 			},
 		},
 		{
-			name: "POST#4 Test",
+			name: `
+POST /api/shorten #4
+not correct url, correct body, correct contentType
+got status 400
+`,
 			request: request{
 				url:         "/api",
 				body:        `{"url": "https://practicum.yandex.ru"}`,
@@ -77,7 +93,11 @@ func TestHandlerPostAPI(t *testing.T) {
 			},
 		},
 		{
-			name: "POST#5 Test",
+			name: `
+POST /api/shorten #5
+correct url, not correct body (not correct key), correct contentType
+got status 400
+`,
 			request: request{
 				url:         "/api/shorten",
 				body:        `{"gg": "https://practicum.yandex23.ru"}`,
