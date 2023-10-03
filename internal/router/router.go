@@ -14,10 +14,10 @@ import (
 func Router(flags *config.Flags, log *zap.Logger) *chi.Mux {
 	r := chi.NewRouter()
 	r.Use(logger.LoggingMiddleware(log))
-	r.Use(compression.GzipMiddleware)
+	r.Use(compression.GzipMiddleware(log))
 	r.Route("/", func(r chi.Router) {
 		r.Post("/", func(w http.ResponseWriter, r *http.Request) {
-			handlers.HandlerPost(w, r, string(flags.BaseURL), string(flags.FileStoragePath))
+			handlers.HandlerPost(w, r, string(flags.BaseURL), string(flags.FileStoragePath), log)
 		})
 	})
 	r.Route("/{id:[a-zA-Z0-9]+}", func(r chi.Router) {
@@ -25,7 +25,7 @@ func Router(flags *config.Flags, log *zap.Logger) *chi.Mux {
 	})
 	r.Route("/api", func(r chi.Router) {
 		r.Post("/shorten", func(w http.ResponseWriter, r *http.Request) {
-			handlers.HandlerPostAPI(w, r, string(flags.BaseURL), string(flags.FileStoragePath))
+			handlers.HandlerPostAPI(w, r, string(flags.BaseURL), string(flags.FileStoragePath), log)
 		})
 	})
 	return r
