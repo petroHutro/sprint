@@ -10,6 +10,8 @@ import (
 
 type BaseURL string
 
+type DatabaseDSN string
+
 type FileStoragePath string
 
 type Logger struct {
@@ -28,6 +30,7 @@ type Flags struct {
 	NetAddress
 	Logger
 	FileStoragePath
+	DatabaseDSN
 }
 
 func NewFlags() Flags {
@@ -43,6 +46,7 @@ func NewFlags() Flags {
 			MultiFlag: false,
 		},
 		FileStoragePath: "/tmp/short-url-db.json",
+		DatabaseDSN:     "host=localhost user=url password=1234 dbname=url sslmode=disable",
 	}
 }
 
@@ -65,6 +69,9 @@ func parseENV(flags *Flags) {
 	if fileStoragePath := os.Getenv("FILE_STORAGE_PATH"); fileStoragePath != "" {
 		flags.FileStoragePath.Set(fileStoragePath)
 	}
+	if databaseDSN := os.Getenv("DATABASE_DSN"); databaseDSN != "" {
+		flags.DatabaseDSN.Set(databaseDSN)
+	}
 }
 
 func parseFlags() *Flags {
@@ -72,6 +79,7 @@ func parseFlags() *Flags {
 	flag.Var(&flags.NetAddress, "a", "address and port to run server")
 	flag.Var(&flags.BaseURL, "b", "BaseUrl")
 	flag.Var(&flags.FileStoragePath, "f", "FileStoragePath")
+	flag.Var(&flags.DatabaseDSN, "d", "DatabaseDSN")
 	flag.BoolVar(&flags.Logger.FileFlag, "l", false, "Logger only file")
 	flag.BoolVar(&flags.Logger.MultiFlag, "L", false, "Logger Multi")
 	flag.Parse()
@@ -93,6 +101,15 @@ func (a FileStoragePath) String() string {
 
 func (a *FileStoragePath) Set(s string) error {
 	*a = FileStoragePath(s)
+	return nil
+}
+
+func (a DatabaseDSN) String() string {
+	return string(a)
+}
+
+func (a *DatabaseDSN) Set(s string) error {
+	*a = DatabaseDSN(s)
 	return nil
 }
 
