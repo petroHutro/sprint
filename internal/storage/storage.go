@@ -28,5 +28,5 @@ func SetDB(key, val string) error {
 		dbSL[val] = key
 		return nil
 	}
-	return errors.New("key in DB")
+	return errors.New("key already DB")
 }

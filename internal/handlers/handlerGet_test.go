@@ -18,10 +18,10 @@ func Test_requestGet(t *testing.T) {
 		FileFlag:  false,
 		MultiFlag: false,
 	}
-	if err := logger.NewLogger(log); err != nil {
+	if err := logger.InitLogger(log); err != nil {
 		logger.Log.Panic(err.Error())
 	}
-	defer logger.Log.CloseFileLoger()
+	defer logger.Log.Shutdown()
 
 	type want struct {
 		code int

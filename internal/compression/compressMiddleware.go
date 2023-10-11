@@ -3,9 +3,9 @@ package compression
 import (
 	"bytes"
 	"io"
-	"log"
 	"net/http"
 
+	"sprint/internal/logger"
 	"sprint/internal/utils"
 	"strings"
 )
@@ -28,13 +28,13 @@ func GzipMiddleware(next http.Handler) http.Handler {
 		if sendsGzip {
 			cr, err := newCompressReader(r.Body)
 			if err != nil {
-				log.Print("GzipMiddleware not body")
+				logger.Log.Error("GzipMiddleware not body:%v", err)
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
 			data, err := io.ReadAll(cr)
 			if err != nil {
-				log.Print("GzipMiddleware ReadAll")
+				logger.Log.Error("GzipMiddleware cannot read body:%v", err)
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
@@ -44,7 +44,7 @@ func GzipMiddleware(next http.Handler) http.Handler {
 			} else if utils.IsText(data) {
 				r.Header.Set("Content-Type", "text/plain")
 			} else {
-				log.Print("GzipMiddleware Content-Type")
+				logger.Log.Error("GzipMiddleware not correct content type:%v", err)
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}

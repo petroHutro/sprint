@@ -48,7 +48,7 @@ func (r *loggingResponseWriter) WriteHeader(statusCode int) {
 	r.responseData.status = statusCode
 }
 
-func (l *Logger) CloseFileLoger() {
+func (l *Logger) Shutdown() {
 	l.logger.Sync()
 }
 
@@ -85,34 +85,27 @@ func newMultiLogger(filePath string) (*zap.Logger, error) {
 	return logger, nil
 }
 
-// func NewLogger(conf config.Logger) (*zap.Logger, error) {
-func NewLogger(conf config.Logger) error {
+func InitLogger(conf config.Logger) error {
 	if conf.MultiFlag {
 		logger, err := newMultiLogger(conf.FilePath)
 		if err != nil {
-			// return nil, fmt.Errorf("cannot create multi logger: %w", err)
 			return fmt.Errorf("cannot create multi logger: %w", err)
 		}
-		// return logger, nil
 		Log.logger = logger
 		return nil
 	} else if conf.FileFlag {
 		logger, err := newFileLogger(conf.FilePath)
 		if err != nil {
-			// return nil, fmt.Errorf("cannot create file logger: %w", err)
 			return fmt.Errorf("cannot create file logger: %w", err)
 
 		}
-		// return logger, nil
 		Log.logger = logger
 		return nil
 	}
 	logger, err := newConsoleLogger()
 	if err != nil {
-		// return nil, fmt.Errorf("cannot create consol logger: %w", err)
 		return fmt.Errorf("cannot create consol logger: %w", err)
 	}
 	Log.logger = logger
 	return nil
-	// return logger, nil
 }

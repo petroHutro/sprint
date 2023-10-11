@@ -11,16 +11,16 @@ import (
 
 // rename 6:30
 func Run() error {
-	flags := config.ConfigureServer()
-	if err := logger.NewLogger(flags.Logger); err != nil {
+	conf := config.LoadServerConfigure()
+	if err := logger.InitLogger(conf.Logger); err != nil {
 		logger.Log.Panic(err.Error())
 	}
-	defer logger.Log.CloseFileLoger()
-	if err := storage.LoadURL(string(flags.FileStoragePath)); err != nil {
+	defer logger.Log.Shutdown()
+	if err := storage.LoadURL(string(conf.FileStoragePath)); err != nil {
 		logger.Log.Panic(err.Error())
 	}
-	r := router.Router(flags)
-	address := flags.Host + ":" + strconv.Itoa(flags.Port)
-	logger.Log.Info("Running server: address:%s port:%d", flags.Host, flags.Port)
+	r := router.Create(conf)
+	address := conf.Host + ":" + strconv.Itoa(conf.Port)
+	logger.Log.Info("Running server: address:%s port:%d", conf.Host, conf.Port)
 	return http.ListenAndServe(address, r)
 }

@@ -3,6 +3,7 @@ package config
 import (
 	"errors"
 	"flag"
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -46,7 +47,7 @@ func NewFlags() Flags {
 	}
 }
 
-func ConfigureServer() *Flags {
+func LoadServerConfigure() *Flags {
 	flags := parseFlags()
 	parseENV(flags)
 	return flags
@@ -107,7 +108,7 @@ func (a *NetAddress) Set(s string) error {
 	}
 	port, err := strconv.Atoi(hp[1])
 	if err != nil {
-		return err
+		return fmt.Errorf("cannot atoi port: %w", err)
 	}
 	a.Host = hp[0]
 	a.Port = port

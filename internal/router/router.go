@@ -10,7 +10,7 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func Router(flags *config.Flags) *chi.Mux {
+func Create(flags *config.Flags) *chi.Mux {
 	r := chi.NewRouter()
 	r.Use(logger.LoggingMiddleware)
 	r.Use(compression.GzipMiddleware)

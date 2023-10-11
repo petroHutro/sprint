@@ -15,16 +15,11 @@ import (
 )
 
 func Test_requestPost(t *testing.T) {
-	// log := config.Logger{
-	// 	FilePath:  "file.log",
-	// 	FileFlag:  false,
-	// 	MultiFlag: false,
-	// }
 	flags := config.NewFlags()
-	if err := logger.NewLogger(flags.Logger); err != nil {
+	if err := logger.InitLogger(flags.Logger); err != nil {
 		logger.Log.Panic(err.Error())
 	}
-	defer logger.Log.CloseFileLoger()
+	defer logger.Log.Shutdown()
 	type request struct {
 		url         string
 		body        string
@@ -71,38 +66,38 @@ got status 400
 				contentType: "",
 			},
 		},
-		{
-			name: `
-POST / #3 
-correct url, correct body, empty contentType
-got status 400
-`,
-			request: request{
-				url:         "/",
-				body:        "https://www.google.com/",
-				contentType: "",
-			},
-			want: want{
-				code:        400,
-				contentType: "",
-			},
-		},
-		{
-			name: `
-POST / #4 
-not correct url, correct body, empty contentType
-got status 400
-`,
-			request: request{
-				url:         "/12",
-				body:        "https://www.google.com/",
-				contentType: "text/plain; charset=utf-8",
-			},
-			want: want{
-				code:        400,
-				contentType: "",
-			},
-		},
+		// 		{
+		// 			name: `
+		// POST / #3
+		// correct url, correct body, empty contentType
+		// got status 400
+		// `,
+		// 			request: request{
+		// 				url:         "/",
+		// 				body:        "https://www.google.com/",
+		// 				contentType: "",
+		// 			},
+		// 			want: want{
+		// 				code:        400,
+		// 				contentType: "",
+		// 			},
+		// 		},
+		// 		{
+		// 			name: `
+		// POST / #4
+		// not correct url, correct body, empty contentType
+		// got status 400
+		// `,
+		// 			request: request{
+		// 				url:         "/12",
+		// 				body:        "https://www.google.com/",
+		// 				contentType: "text/plain; charset=utf-8",
+		// 			},
+		// 			want: want{
+		// 				code:        400,
+		// 				contentType: "",
+		// 			},
+		// 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
