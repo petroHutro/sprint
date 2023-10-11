@@ -48,8 +48,8 @@ func (r *loggingResponseWriter) WriteHeader(statusCode int) {
 	r.responseData.status = statusCode
 }
 
-func (logger *Logger) CloseFileLoger() {
-	logger.logger.Sync()
+func (l *Logger) CloseFileLoger() {
+	l.logger.Sync()
 }
 
 func newFileLogger(logFile string) (*zap.Logger, error) {

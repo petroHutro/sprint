@@ -3,7 +3,9 @@ package handlers_test
 import (
 	"net/http"
 	"net/http/httptest"
+	"sprint/internal/config"
 	"sprint/internal/handlers"
+	"sprint/internal/logger"
 	"sprint/internal/storage"
 	"testing"
 
@@ -11,6 +13,16 @@ import (
 )
 
 func Test_requestGet(t *testing.T) {
+	log := config.Logger{
+		FilePath:  "file.log",
+		FileFlag:  false,
+		MultiFlag: false,
+	}
+	if err := logger.NewLogger(log); err != nil {
+		logger.Log.Panic(err.Error())
+	}
+	defer logger.Log.CloseFileLoger()
+
 	type want struct {
 		code int
 		link string

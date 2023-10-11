@@ -6,6 +6,7 @@ import (
 	"net/http/httptest"
 	"sprint/internal/config"
 	"sprint/internal/handlers"
+	"sprint/internal/logger"
 	"strings"
 	"testing"
 
@@ -14,6 +15,16 @@ import (
 )
 
 func Test_requestPost(t *testing.T) {
+	// log := config.Logger{
+	// 	FilePath:  "file.log",
+	// 	FileFlag:  false,
+	// 	MultiFlag: false,
+	// }
+	flags := config.NewFlags()
+	if err := logger.NewLogger(flags.Logger); err != nil {
+		logger.Log.Panic(err.Error())
+	}
+	defer logger.Log.CloseFileLoger()
 	type request struct {
 		url         string
 		body        string
@@ -95,12 +106,11 @@ got status 400
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			flags := config.NewFlags()
 			body := strings.NewReader(tt.body)
 			r := httptest.NewRequest(http.MethodPost, tt.url, body)
 			r.Header.Set("Content-Type", tt.contentType)
 			w := httptest.NewRecorder()
-			handlers.HandlerPost(w, r, string(flags.BaseURL), "")
+			handlers.HandlerPost(w, r, string(flags.BaseURL), string(flags.FileStoragePath))
 			rez := w.Result()
 			defer rez.Body.Close()
 			assert.Equal(t, tt.want.code, rez.StatusCode)

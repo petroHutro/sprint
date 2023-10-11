@@ -6,6 +6,7 @@ import (
 	"net/http/httptest"
 	"sprint/internal/config"
 	"sprint/internal/handlers"
+	"sprint/internal/logger"
 	"strings"
 	"testing"
 
@@ -14,6 +15,16 @@ import (
 )
 
 func TestHandlerPostAPI(t *testing.T) {
+	log := config.Logger{
+		FilePath:  "file.log",
+		FileFlag:  false,
+		MultiFlag: false,
+	}
+	if err := logger.NewLogger(log); err != nil {
+		logger.Log.Panic(err.Error())
+	}
+	defer logger.Log.CloseFileLoger()
+
 	type request struct {
 		url         string
 		body        string

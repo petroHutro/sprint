@@ -1,7 +1,6 @@
 package app
 
 import (
-	"log"
 	"net/http"
 	"sprint/internal/config"
 	"sprint/internal/logger"
@@ -14,7 +13,7 @@ import (
 func Run() error {
 	flags := config.ConfigureServer()
 	if err := logger.NewLogger(flags.Logger); err != nil {
-		log.Panic(err.Error())
+		logger.Log.Panic(err.Error())
 	}
 	defer logger.Log.CloseFileLoger()
 	if err := storage.LoadURL(string(flags.FileStoragePath)); err != nil {
