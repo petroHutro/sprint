@@ -1,13 +1,17 @@
 package storage
 
 import (
+	"fmt"
 	"sprint/internal/utils"
 )
 
-func LongToShort(link, fname string) {
-	if err := GetDB(string(link)); err == "" {
-		shortLink := utils.LinkShortening()
-		SetDB(string(link), shortLink)
-		saveURL(string(link), shortLink, fname)
+func LongToShort(link, fname string) error {
+	if shortLink := GetDB(link); shortLink == "" {
+		shortLink := utils.LinkShortening() //rename
+		SetDB(link, shortLink)
+		if err := saveURL(link, shortLink, fname); err != nil {
+			return fmt.Errorf("cannot save url in file: %w", err)
+		}
 	}
+	return nil
 }

@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"fmt"
 	"net/http"
 	"sprint/internal/config"
 
@@ -18,6 +19,23 @@ type (
 		responseData *responseData
 	}
 )
+type Logger struct {
+	logger *zap.Logger
+}
+
+var Log Logger
+
+func (l *Logger) Error(msg string, fields ...interface{}) {
+	l.logger.Error(fmt.Sprintf(msg, fields...))
+}
+
+func (l *Logger) Info(msg string, fields ...interface{}) {
+	l.logger.Info(fmt.Sprintf(msg, fields...))
+}
+
+func (l *Logger) Panic(msg string, fields ...zap.Field) {
+	l.logger.Panic(msg, fields...)
+}
 
 func (r *loggingResponseWriter) Write(b []byte) (int, error) {
 	size, err := r.ResponseWriter.Write(b)
@@ -30,8 +48,8 @@ func (r *loggingResponseWriter) WriteHeader(statusCode int) {
 	r.responseData.status = statusCode
 }
 
-func CloseFileLoger(logger *zap.Logger) {
-	logger.Sync()
+func (logger *Logger) CloseFileLoger() {
+	logger.logger.Sync()
 }
 
 func newFileLogger(logFile string) (*zap.Logger, error) {
@@ -39,7 +57,7 @@ func newFileLogger(logFile string) (*zap.Logger, error) {
 	cfg.OutputPaths = []string{logFile}
 	logger, err := cfg.Build()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannot create file logger Build: %w", err)
 	}
 	return logger, nil
 }
@@ -56,34 +74,45 @@ func newConsoleLogger() (*zap.Logger, error) {
 func newMultiLogger(filePath string) (*zap.Logger, error) {
 	consoleLogger, err := newConsoleLogger()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannot create consol logger in multi logger: %w", err)
 	}
 	fileLogger, err := newFileLogger(filePath)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannot create file logger in multi logger: %w", err)
 	}
 	multiCore := zapcore.NewTee(fileLogger.Core(), consoleLogger.Core())
 	logger := zap.New(multiCore)
 	return logger, nil
 }
 
-func NewLogger(conf config.Logger) (*zap.Logger, error) {
+// func NewLogger(conf config.Logger) (*zap.Logger, error) {
+func NewLogger(conf config.Logger) error {
 	if conf.MultiFlag {
 		logger, err := newMultiLogger(conf.FilePath)
 		if err != nil {
-			return nil, err
+			// return nil, fmt.Errorf("cannot create multi logger: %w", err)
+			return fmt.Errorf("cannot create multi logger: %w", err)
 		}
-		return logger, nil
+		// return logger, nil
+		Log.logger = logger
+		return nil
 	} else if conf.FileFlag {
 		logger, err := newFileLogger(conf.FilePath)
 		if err != nil {
-			return nil, err
+			// return nil, fmt.Errorf("cannot create file logger: %w", err)
+			return fmt.Errorf("cannot create file logger: %w", err)
+
 		}
-		return logger, nil
+		// return logger, nil
+		Log.logger = logger
+		return nil
 	}
 	logger, err := newConsoleLogger()
 	if err != nil {
-		return nil, err
+		// return nil, fmt.Errorf("cannot create consol logger: %w", err)
+		return fmt.Errorf("cannot create consol logger: %w", err)
 	}
-	return logger, nil
+	Log.logger = logger
+	return nil
+	// return logger, nil
 }
