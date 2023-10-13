@@ -100,8 +100,8 @@ func (m *memeryBase) SetDB(ctx context.Context, key, val string) error {
 
 }
 
-func (m *dataBase) GetLong(ctx context.Context, key string) string {
-	row := m.db.QueryRowContext(ctx, `
+func (d *dataBase) GetLong(ctx context.Context, key string) string {
+	row := d.db.QueryRowContext(ctx, `
 	SELECT long FROM links WHERE short = $1`,
 		key,
 	)
@@ -114,8 +114,8 @@ func (m *dataBase) GetLong(ctx context.Context, key string) string {
 	return long
 }
 
-func (m *dataBase) GetShort(ctx context.Context, key string) string {
-	row := m.db.QueryRowContext(ctx, `
+func (d *dataBase) GetShort(ctx context.Context, key string) string {
+	row := d.db.QueryRowContext(ctx, `
 		SELECT short FROM links WHERE long = $1`,
 		key,
 	)
@@ -128,9 +128,9 @@ func (m *dataBase) GetShort(ctx context.Context, key string) string {
 	return short
 }
 
-func (m *dataBase) SetDB(ctx context.Context, key, val string) error {
-	if m.GetShort(ctx, key) == "" {
-		_, err := m.db.ExecContext(ctx, `
+func (d *dataBase) SetDB(ctx context.Context, key, val string) error {
+	if d.GetShort(ctx, key) == "" {
+		_, err := d.db.ExecContext(ctx, `
 			INSERT INTO links
 			(long, short)
 			VALUES
