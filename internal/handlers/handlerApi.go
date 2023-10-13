@@ -8,11 +8,11 @@ import (
 	"sprint/internal/storage"
 )
 
-type DataReq struct {
+type DataReqAPI struct {
 	URL string `json:"url"`
 }
 
-type DataResp struct {
+type DataRespAPI struct {
 	Result string `json:"result"`
 }
 
@@ -23,7 +23,8 @@ func HandlerPostAPI(w http.ResponseWriter, r *http.Request, baseAddress, file st
 	// 	return
 	// }
 	var buf bytes.Buffer
-	var data DataReq
+	var data DataReqAPI
+
 	_, err := buf.ReadFrom(r.Body)
 	if err != nil {
 		logger.Log.Error("PostAPI not body :%v", err)
@@ -41,7 +42,7 @@ func HandlerPostAPI(w http.ResponseWriter, r *http.Request, baseAddress, file st
 		return
 	}
 	db.LongToShort(r.Context(), data.URL, file)
-	dataResp := DataResp{Result: baseAddress + "/" + db.GetShort(r.Context(), data.URL)}
+	dataResp := DataRespAPI{Result: baseAddress + "/" + db.GetShort(r.Context(), data.URL)}
 	resp, err := json.Marshal(dataResp)
 	if err != nil {
 		logger.Log.Error("PostAPI not json to byte :%v", err)

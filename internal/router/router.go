@@ -30,9 +30,12 @@ func Create(flags *config.Flags, db *storage.StorageBase) *chi.Mux {
 			handlers.HandlerGet(w, r, db)
 		})
 	})
-	r.Route("/api", func(r chi.Router) {
-		r.Post("/shorten", func(w http.ResponseWriter, r *http.Request) {
+	r.Route("/api/shorten", func(r chi.Router) {
+		r.Post("/", func(w http.ResponseWriter, r *http.Request) {
 			handlers.HandlerPostAPI(w, r, string(flags.BaseURL), flags.FileStoragePath, db)
+		})
+		r.Post("/batch", func(w http.ResponseWriter, r *http.Request) {
+			handlers.HandlerPostBatch(w, r, string(flags.BaseURL), flags.FileStoragePath, db)
 		})
 	})
 	return r
