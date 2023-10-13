@@ -1,12 +1,16 @@
 package storage
 
-import "errors"
+import (
+	"context"
+	"errors"
+)
 
-func ShortToLong(shortLink string) (string, error) {
-	sm.Lock()
-	defer sm.Unlock()
-	if _, ok := dbSL[shortLink]; ok {
-		return dbSL[shortLink], nil
+func (s *StorageBase) ShortToLong(ctx context.Context, shortLink string) (string, error) {
+	if el := s.GetLong(ctx, shortLink); el != "" {
+		return el, nil
 	}
+	// if _, ok := dbSL[shortLink]; ok {
+	// 	return dbSL[shortLink], nil
+	// }
 	return "", errors.New("no short link")
 }

@@ -1,6 +1,7 @@
 package handlers_test
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"sprint/internal/config"
@@ -8,6 +9,7 @@ import (
 	"sprint/internal/logger"
 	"sprint/internal/storage"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -22,6 +24,12 @@ func Test_requestGet(t *testing.T) {
 		logger.Log.Panic(err.Error())
 	}
 	defer logger.Log.Shutdown()
+
+	confData := config.Storage{
+		FileStoragePath: "",
+		DatabaseDSN:     "",
+	}
+	st, _ := storage.InitStorage(&confData)
 
 	type want struct {
 		code int
@@ -79,10 +87,12 @@ got status 400
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			storage.SetDB(tt.want.link, tt.shortLink)
+			ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+			defer cancel()
+			st.SetDB(ctx, tt.want.link, tt.shortLink)
 			r := httptest.NewRequest(http.MethodGet, tt.request, nil)
 			w := httptest.NewRecorder()
-			handlers.HandlerGet(w, r)
+			handlers.HandlerGet(w, r, st)
 
 			rez := w.Result()
 			defer rez.Body.Close()

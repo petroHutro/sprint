@@ -7,6 +7,7 @@ import (
 	"sprint/internal/config"
 	"sprint/internal/handlers"
 	"sprint/internal/logger"
+	"sprint/internal/storage"
 	"strings"
 	"testing"
 
@@ -20,6 +21,13 @@ func Test_requestPost(t *testing.T) {
 		logger.Log.Panic(err.Error())
 	}
 	defer logger.Log.Shutdown()
+
+	confData := config.Storage{
+		FileStoragePath: "",
+		DatabaseDSN:     "",
+	}
+	st, _ := storage.InitStorage(&confData)
+
 	type request struct {
 		url         string
 		body        string
@@ -105,7 +113,7 @@ got status 400
 			r := httptest.NewRequest(http.MethodPost, tt.url, body)
 			r.Header.Set("Content-Type", tt.contentType)
 			w := httptest.NewRecorder()
-			handlers.HandlerPost(w, r, string(flags.BaseURL), string(flags.FileStoragePath))
+			handlers.HandlerPost(w, r, string(flags.BaseURL), string(flags.FileStoragePath), st)
 			rez := w.Result()
 			defer rez.Body.Close()
 			assert.Equal(t, tt.want.code, rez.StatusCode)

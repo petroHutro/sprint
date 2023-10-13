@@ -16,7 +16,7 @@ type DataResp struct {
 	Result string `json:"result"`
 }
 
-func HandlerPostAPI(w http.ResponseWriter, r *http.Request, baseAddress, file string) {
+func HandlerPostAPI(w http.ResponseWriter, r *http.Request, baseAddress, file string, db *storage.StorageBase) {
 	// if r.URL.Path != "/api/shorten" || utils.ValidContentType(r.Header.Get("Content-Type"), "application/json") != nil {
 	// 	logger.Log.Error("PostAPI not Path or not Content-Type")
 	// 	w.WriteHeader(http.StatusBadRequest)
@@ -40,8 +40,8 @@ func HandlerPostAPI(w http.ResponseWriter, r *http.Request, baseAddress, file st
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	storage.LongToShort(data.URL, file)
-	dataResp := DataResp{Result: baseAddress + "/" + storage.GetDB(data.URL)}
+	db.LongToShort(r.Context(), data.URL, file)
+	dataResp := DataResp{Result: baseAddress + "/" + db.GetShort(r.Context(), data.URL)}
 	resp, err := json.Marshal(dataResp)
 	if err != nil {
 		logger.Log.Error("PostAPI not json to byte :%v", err)

@@ -67,6 +67,7 @@ func newConsoleLogger() (*zap.Logger, error) {
 	config.EncoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
 	config.EncoderConfig.TimeKey = ""
 	config.EncoderConfig.EncodeCaller = nil
+	config.DisableStacktrace = true
 	logger, _ := config.Build()
 	return logger, nil
 }

@@ -11,14 +11,13 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func Create(flags *config.Flags) *chi.Mux {
-	db := storage.Connection(string(flags.DatabaseDSN))
+func Create(flags *config.Flags, db *storage.StorageBase) *chi.Mux {
 	r := chi.NewRouter()
 	r.Use(logger.LoggingMiddleware)
 	r.Use(compression.GzipMiddleware)
 	r.Route("/", func(r chi.Router) {
 		r.Post("/", func(w http.ResponseWriter, r *http.Request) {
-			handlers.HandlerPost(w, r, string(flags.BaseURL), string(flags.FileStoragePath))
+			handlers.HandlerPost(w, r, string(flags.BaseURL), flags.FileStoragePath, db)
 		})
 	})
 	r.Route("/ping", func(r chi.Router) {
@@ -27,11 +26,13 @@ func Create(flags *config.Flags) *chi.Mux {
 		})
 	})
 	r.Route("/{id:[a-zA-Z0-9]+}", func(r chi.Router) {
-		r.Get("/", handlers.HandlerGet)
+		r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+			handlers.HandlerGet(w, r, db)
+		})
 	})
 	r.Route("/api", func(r chi.Router) {
 		r.Post("/shorten", func(w http.ResponseWriter, r *http.Request) {
-			handlers.HandlerPostAPI(w, r, string(flags.BaseURL), string(flags.FileStoragePath))
+			handlers.HandlerPostAPI(w, r, string(flags.BaseURL), flags.FileStoragePath, db)
 		})
 	})
 	return r

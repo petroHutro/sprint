@@ -7,7 +7,7 @@ import (
 	"sprint/internal/storage"
 )
 
-func HandlerPost(w http.ResponseWriter, r *http.Request, baseAddress, file string) {
+func HandlerPost(w http.ResponseWriter, r *http.Request, baseAddress, file string, db *storage.StorageBase) {
 	// if r.URL.Path != "/" || utils.ValidContentType(r.Header.Get("Content-Type"), "text/plain") != nil {
 	// 	log.Print("Post not Path or not Content-Type")
 	// 	w.WriteHeader(http.StatusBadRequest)
@@ -20,12 +20,12 @@ func HandlerPost(w http.ResponseWriter, r *http.Request, baseAddress, file strin
 		return
 	}
 	defer r.Body.Close()
-	if err := storage.LongToShort(string(link), file); err != nil {
+	if err := db.LongToShort(r.Context(), string(link), file); err != nil {
 		logger.Log.Error("cannot convert long to short :%v", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte(baseAddress + "/" + storage.GetDB(string(link))))
+	w.Write([]byte(baseAddress + "/" + db.GetShort(r.Context(), string(link))))
 }

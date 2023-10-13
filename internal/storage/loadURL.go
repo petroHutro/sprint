@@ -1,13 +1,15 @@
 package storage
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"os"
+	"time"
 )
 
-func LoadURL(fname string) error {
+func (m *memeryBase) LoadURL(fname string) error {
 	file, err := os.OpenFile(fname, os.O_RDONLY|os.O_CREATE, 0666)
 	if err != nil {
 		return fmt.Errorf("cannot open file with url: %w", err)
@@ -21,7 +23,10 @@ func LoadURL(fname string) error {
 		} else if err != nil {
 			return fmt.Errorf("cannot read file: %w", err)
 		}
-		SetDB(url.LongURL, url.ShortURL)
+		ctx, cancel := context.WithTimeout(context.Background(),
+			time.Duration(time.Millisecond*500))
+		defer cancel()
+		m.SetDB(ctx, url.LongURL, url.ShortURL)
 	}
 	return nil
 }
