@@ -9,12 +9,12 @@ import (
 )
 
 type DataReqBatch struct {
-	Id   string `json:"correlation_id"`
+	ID   string `json:"correlation_id"`
 	Long string `json:"original_url"`
 }
 
 type DataRespBatch struct {
-	Id    string `json:"correlation_id"`
+	ID    string `json:"correlation_id"`
 	Short string `json:"short_url"`
 }
 
@@ -36,7 +36,7 @@ func HandlerPostBatch(w http.ResponseWriter, r *http.Request, baseAddress, file 
 	}
 
 	for _, item := range data {
-		if item.Id == "" || item.Long == "" {
+		if item.ID == "" || item.Long == "" {
 			logger.Log.Error("PostBatch not correlation_id or original_url: %v", err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
@@ -48,7 +48,7 @@ func HandlerPostBatch(w http.ResponseWriter, r *http.Request, baseAddress, file 
 	for _, item := range data {
 		db.LongToShort(r.Context(), item.Long, file)
 		dataResp = append(dataResp, DataRespBatch{
-			Id:    item.Id,
+			ID:    item.ID,
 			Short: baseAddress + "/" + db.GetShort(r.Context(), item.Long)})
 	}
 	resp, err := json.Marshal(dataResp)
