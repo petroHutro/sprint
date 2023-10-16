@@ -3,10 +3,27 @@ package storage
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"sprint/internal/utils"
 	"time"
+
+	"github.com/jackc/pgerrcode"
+	"github.com/jackc/pgx/v5/pgconn"
 )
+
+type RepError struct {
+	Err        error
+	Repetition bool
+}
+
+func (e *RepError) Error() string {
+	return e.Err.Error()
+}
+
+func NewErrorRep(err error, repetition bool) *RepError {
+	return &RepError{Err: err, Repetition: repetition}
+}
 
 type dataBase struct {
 	db *sql.DB
@@ -58,23 +75,30 @@ func (d *dataBase) GetShort(ctx context.Context, key string) string {
 }
 
 func (d *dataBase) SetDB(ctx context.Context, key, val string) error {
-	if d.GetShort(ctx, key) == "" {
-		_, err := d.db.ExecContext(ctx, `
-			INSERT INTO links
-			(long, short)
-			VALUES
-			($1, $2);
-    	`, key, val)
+	_, err := d.db.ExecContext(ctx, `
+		INSERT INTO links
+		(long, short)
+		VALUES
+		($1, $2);
+	`, key, val)
+
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgerrcode.IsIntegrityConstraintViolation(pgErr.Code) {
+			return &RepError{Err: err, Repetition: true}
+		}
 		return fmt.Errorf("cannot set database: %w", err)
 	}
 	return nil
 }
 
 func (d *dataBase) SetAllDB(ctx context.Context, data []string) error {
+	repetition := false
 	tx, err := d.db.Begin()
 	if err != nil {
 		return fmt.Errorf("cannot begin: %w", err)
 	}
+
 	for _, v := range data {
 		shortLink := utils.GetShortLink()
 		_, err := tx.ExecContext(ctx, `
@@ -83,10 +107,20 @@ func (d *dataBase) SetAllDB(ctx context.Context, data []string) error {
 			VALUES
 			($1, $2);
     	`, v, shortLink)
+
 		if err != nil {
-			tx.Rollback()
-			return fmt.Errorf("cannot exec: %w", err)
+			var pgErr *pgconn.PgError
+			if errors.As(err, &pgErr) && pgerrcode.IsIntegrityConstraintViolation(pgErr.Code) {
+				repetition = true
+			} else {
+				tx.Rollback()
+				return fmt.Errorf("cannot exec: %w", err)
+			}
 		}
 	}
-	return tx.Commit()
+	if err := tx.Commit(); err != nil {
+		tx.Rollback()
+		return fmt.Errorf("transaction commit failed: %w", err)
+	}
+	return NewErrorRep(nil, repetition)
 }

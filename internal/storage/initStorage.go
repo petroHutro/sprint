@@ -23,7 +23,8 @@ func (s *StorageBase) createTable(ctx context.Context) error {
 				CREATE TABLE links (
 					id SERIAL PRIMARY KEY,
 					long  TEXT NOT NULL,
-					short TEXT NOT NULL
+					short TEXT NOT NULL,
+					UNIQUE (long)
 				);
 			END IF;
 		END $$;

@@ -46,10 +46,16 @@ func HandlerPostBatch(w http.ResponseWriter, r *http.Request, baseAddress, file 
 		longs = append(longs, item.Long)
 	}
 
+	statusCode := http.StatusCreated
 	if err := db.SetAllDB(r.Context(), longs); err != nil {
-		logger.Log.Error("cannot set all: %v", err)
-		w.WriteHeader(http.StatusBadRequest)
-		return
+		if repErr, ok := err.(*storage.RepError); ok && repErr.Repetition {
+			statusCode = http.StatusConflict
+			logger.Log.Error("long already db :%v", err)
+		} else {
+			logger.Log.Error("cannot set all: %v", err)
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
 	}
 
 	var dataResp []DataRespBatch
@@ -59,13 +65,15 @@ func HandlerPostBatch(w http.ResponseWriter, r *http.Request, baseAddress, file 
 			ID:    item.ID,
 			Short: baseAddress + "/" + db.GetShort(r.Context(), item.Long)})
 	}
+
 	resp, err := json.Marshal(dataResp)
 	if err != nil {
 		logger.Log.Error("PostAPI not json to byte :%v", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(statusCode)
 	w.Write(resp)
 }

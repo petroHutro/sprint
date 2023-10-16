@@ -17,11 +17,6 @@ type DataRespAPI struct {
 }
 
 func HandlerPostAPI(w http.ResponseWriter, r *http.Request, baseAddress, file string, db *storage.StorageBase) {
-	// if r.URL.Path != "/api/shorten" || utils.ValidContentType(r.Header.Get("Content-Type"), "application/json") != nil {
-	// 	logger.Log.Error("PostAPI not Path or not Content-Type")
-	// 	w.WriteHeader(http.StatusBadRequest)
-	// 	return
-	// }
 	var buf bytes.Buffer
 	var data DataReqAPI
 
@@ -41,7 +36,19 @@ func HandlerPostAPI(w http.ResponseWriter, r *http.Request, baseAddress, file st
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	db.LongToShort(r.Context(), data.URL, file)
+	err = db.LongToShort(r.Context(), data.URL, file)
+	statusCode := http.StatusCreated
+	if err != nil {
+		if repErr, ok := err.(*storage.RepError); ok && repErr.Repetition {
+			statusCode = http.StatusConflict
+			logger.Log.Error("long already db :%v", err)
+		} else {
+			logger.Log.Error("cannot convert long to short :%v", err)
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+	}
+
 	dataResp := DataRespAPI{Result: baseAddress + "/" + db.GetShort(r.Context(), data.URL)}
 	resp, err := json.Marshal(dataResp)
 	if err != nil {
@@ -50,6 +57,6 @@ func HandlerPostAPI(w http.ResponseWriter, r *http.Request, baseAddress, file st
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(statusCode)
 	w.Write(resp)
 }

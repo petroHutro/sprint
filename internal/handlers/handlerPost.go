@@ -8,11 +8,6 @@ import (
 )
 
 func HandlerPost(w http.ResponseWriter, r *http.Request, baseAddress, file string, db *storage.StorageBase) {
-	// if r.URL.Path != "/" || utils.ValidContentType(r.Header.Get("Content-Type"), "text/plain") != nil {
-	// 	log.Print("Post not Path or not Content-Type")
-	// 	w.WriteHeader(http.StatusBadRequest)
-	// 	return
-	// }
 	link, err := io.ReadAll(r.Body)
 	if err != nil || len(link) == 0 {
 		logger.Log.Error("Post not body %v", err)
@@ -20,12 +15,19 @@ func HandlerPost(w http.ResponseWriter, r *http.Request, baseAddress, file strin
 		return
 	}
 	defer r.Body.Close()
-	if err := db.LongToShort(r.Context(), string(link), file); err != nil {
-		logger.Log.Error("cannot convert long to short :%v", err)
-		w.WriteHeader(http.StatusBadRequest)
-		return
+	err = db.LongToShort(r.Context(), string(link), file)
+	statusCode := http.StatusCreated
+	if err != nil {
+		if repErr, ok := err.(*storage.RepError); ok && repErr.Repetition {
+			statusCode = http.StatusConflict
+			logger.Log.Error("long already db :%v", err)
+		} else {
+			logger.Log.Error("cannot convert long to short :%v", err)
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
 	}
 	w.Header().Set("Content-Type", "text/plain")
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(statusCode)
 	w.Write([]byte(baseAddress + "/" + db.GetShort(r.Context(), string(link))))
 }

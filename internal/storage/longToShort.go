@@ -7,13 +7,14 @@ import (
 )
 
 func (s *StorageBase) LongToShort(ctx context.Context, link, fname string) error {
-	if shortLink := s.GetShort(ctx, link); shortLink == "" {
-		shortLink := utils.GetShortLink()
-		s.SetDB(ctx, link, shortLink)
-		if fname != "" {
-			if err := saveURL(link, shortLink, fname); err != nil {
-				return fmt.Errorf("cannot save url in file: %w", err)
-			}
+	shortLink := utils.GetShortLink()
+	if err := s.SetDB(ctx, link, shortLink); err != nil {
+		return fmt.Errorf("cannot set: %w", err)
+	}
+
+	if fname != "" {
+		if err := saveURL(link, shortLink, fname); err != nil {
+			return fmt.Errorf("cannot save url in file: %w", err)
 		}
 	}
 	return nil

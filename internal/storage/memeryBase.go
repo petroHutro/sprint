@@ -56,6 +56,7 @@ func (m *memeryBase) SetDB(ctx context.Context, key, val string) error {
 	}
 }
 
+// (error, bool) проверить
 func (m *memeryBase) SetAllDB(ctx context.Context, data []string) error {
 	for _, v := range data {
 		shortLink := utils.GetShortLink()
