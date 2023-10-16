@@ -52,18 +52,23 @@ func (m *memeryBase) SetDB(ctx context.Context, key, val string) error {
 			m.dbSL[val] = key
 			return nil
 		}
-		return errors.New("key already DB")
+		return &RepError{Err: errors.New("key already DB"), Repetition: true}
 	}
 }
 
 // (error, bool) проверить
 func (m *memeryBase) SetAllDB(ctx context.Context, data []string) error {
+	repetition := false
 	for _, v := range data {
 		shortLink := utils.GetShortLink()
 		err := m.SetDB(ctx, v, shortLink)
 		if err != nil {
-			return fmt.Errorf("cannot set: %w", err)
+			if repErr, ok := err.(*RepError); ok && repErr.Repetition {
+				repetition = true
+			} else {
+				return fmt.Errorf("cannot set: %w", err)
+			}
 		}
 	}
-	return nil
+	return NewErrorRep(nil, repetition)
 }
