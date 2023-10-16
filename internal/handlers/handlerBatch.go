@@ -3,6 +3,7 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"sprint/internal/logger"
 	"sprint/internal/storage"
@@ -48,7 +49,9 @@ func HandlerPostBatch(w http.ResponseWriter, r *http.Request, baseAddress, file 
 
 	statusCode := http.StatusCreated
 	if err := db.SetAllDB(r.Context(), longs); err != nil {
-		if repErr, ok := err.(*storage.RepError); ok && repErr.Repetition {
+		repErr, ok := err.(*storage.RepError)
+		fmt.Println(repErr, ok, repErr.Repetition)
+		if ok && repErr.Repetition {
 			statusCode = http.StatusConflict
 			logger.Log.Error("long already db :%v", err)
 		} else {

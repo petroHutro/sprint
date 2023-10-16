@@ -70,5 +70,8 @@ func (m *memeryBase) SetAllDB(ctx context.Context, data []string) error {
 			}
 		}
 	}
-	return NewErrorRep(nil, repetition)
+	if repetition {
+		return NewErrorRep(errors.New("long already db"), repetition)
+	}
+	return nil
 }
