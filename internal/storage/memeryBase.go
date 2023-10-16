@@ -56,10 +56,10 @@ func (m *memeryBase) SetDB(ctx context.Context, key, val string) error {
 	}
 }
 
-func (d *memeryBase) SetAllDB(ctx context.Context, data []string) error {
+func (m *memeryBase) SetAllDB(ctx context.Context, data []string) error {
 	for _, v := range data {
 		shortLink := utils.GetShortLink()
-		err := d.SetDB(ctx, v, shortLink)
+		err := m.SetDB(ctx, v, shortLink)
 		if err != nil {
 			return fmt.Errorf("cannot set: %w", err)
 		}
