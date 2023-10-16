@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"sprint/internal/utils"
 	"time"
 )
 
@@ -67,4 +68,25 @@ func (d *dataBase) SetDB(ctx context.Context, key, val string) error {
 		return fmt.Errorf("cannot set database: %w", err)
 	}
 	return nil
+}
+
+func (d *dataBase) SetAllDB(ctx context.Context, data []string) error {
+	tx, err := d.db.Begin()
+	if err != nil {
+		return fmt.Errorf("cannot begin: %w", err)
+	}
+	for _, v := range data {
+		shortLink := utils.GetShortLink()
+		_, err := tx.ExecContext(ctx, `
+			INSERT INTO links
+			(long, short)
+			VALUES
+			($1, $2);
+    	`, v, shortLink)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("cannot exec: %w", err)
+		}
+	}
+	return tx.Commit()
 }

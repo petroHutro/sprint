@@ -35,18 +35,26 @@ func HandlerPostBatch(w http.ResponseWriter, r *http.Request, baseAddress, file 
 		return
 	}
 
+	var longs []string
+
 	for _, item := range data {
 		if item.ID == "" || item.Long == "" {
 			logger.Log.Error("PostBatch not correlation_id or original_url: %v", err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
+		longs = append(longs, item.Long)
+	}
+
+	if err := db.SetAllDB(r.Context(), longs); err != nil {
+		logger.Log.Error("cannot set all: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 
 	var dataResp []DataRespBatch
 
 	for _, item := range data {
-		db.LongToShort(r.Context(), item.Long, file)
 		dataResp = append(dataResp, DataRespBatch{
 			ID:    item.ID,
 			Short: baseAddress + "/" + db.GetShort(r.Context(), item.Long)})

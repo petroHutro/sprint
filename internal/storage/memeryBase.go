@@ -3,6 +3,8 @@ package storage
 import (
 	"context"
 	"errors"
+	"fmt"
+	"sprint/internal/utils"
 	"sync"
 )
 
@@ -52,4 +54,15 @@ func (m *memeryBase) SetDB(ctx context.Context, key, val string) error {
 		}
 		return errors.New("key already DB")
 	}
+}
+
+func (d *memeryBase) SetAllDB(ctx context.Context, data []string) error {
+	for _, v := range data {
+		shortLink := utils.GetShortLink()
+		err := d.SetDB(ctx, v, shortLink)
+		if err != nil {
+			return fmt.Errorf("cannot set: %w", err)
+		}
+	}
+	return nil
 }

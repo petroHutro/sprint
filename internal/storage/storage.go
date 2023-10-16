@@ -26,6 +26,7 @@ type base interface {
 	GetShort(ctx context.Context, key string) string
 	GetLong(ctx context.Context, key string) string
 	SetDB(ctx context.Context, key, val string) error
+	SetAllDB(ctx context.Context, data []string) error
 }
 
 func (s *StorageBase) PingDB() error {
