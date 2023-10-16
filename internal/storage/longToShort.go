@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sprint/internal/utils"
 )
@@ -9,7 +10,12 @@ import (
 func (s *StorageBase) LongToShort(ctx context.Context, link, fname string) error {
 	shortLink := utils.GetShortLink()
 	if err := s.SetDB(ctx, link, shortLink); err != nil {
-		return fmt.Errorf("cannot set: %w", err)
+		if repErr, ok := err.(*RepError); ok && repErr.Repetition {
+			return &RepError{Err: errors.New("key already DB"), Repetition: true}
+			// repetition = true
+		} else {
+			return fmt.Errorf("cannot set: %w", err)
+		}
 	}
 
 	if fname != "" {
