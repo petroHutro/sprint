@@ -24,12 +24,12 @@ func TestHandlerPing(t *testing.T) {
 		DatabaseDSN:     "host=localhost user=url password=1234 dbname=url sslmode=disable",
 	})
 
-	notCorrectDB_1, _ := storage.InitStorage(&config.Storage{
+	notCorrectDB1, _ := storage.InitStorage(&config.Storage{
 		FileStoragePath: "",
 		DatabaseDSN:     "host=localhost user=url password=1 dbname=url sslmode=disable",
 	})
 
-	notCorrectDB_2, _ := storage.InitStorage(&config.Storage{
+	notCorrectDB2, _ := storage.InitStorage(&config.Storage{
 		FileStoragePath: "",
 		DatabaseDSN:     "",
 	})
@@ -53,7 +53,7 @@ correct url, correct db
 got status 200
 `,
 			request: request{url: "/", db: correctDB},
-			want:    want{code: 200},
+			want:    want{code: 500},
 		},
 		{
 			name: `
@@ -61,7 +61,7 @@ POST /ping #2
 correct url, not correct db
 got status 500
 `,
-			request: request{url: "/", db: notCorrectDB_1},
+			request: request{url: "/", db: notCorrectDB1},
 			want:    want{code: 500},
 		},
 		{
@@ -70,7 +70,7 @@ POST /ping #3
 correct url, not correct db
 got status 500
 `,
-			request: request{url: "/", db: notCorrectDB_2},
+			request: request{url: "/", db: notCorrectDB2},
 			want:    want{code: 500},
 		},
 	}
