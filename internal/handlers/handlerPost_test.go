@@ -74,38 +74,6 @@ got status 400
 				contentType: "",
 			},
 		},
-		// 		{
-		// 			name: `
-		// POST / #3
-		// correct url, correct body, empty contentType
-		// got status 400
-		// `,
-		// 			request: request{
-		// 				url:         "/",
-		// 				body:        "https://www.google.com/",
-		// 				contentType: "",
-		// 			},
-		// 			want: want{
-		// 				code:        400,
-		// 				contentType: "",
-		// 			},
-		// 		},
-		// 		{
-		// 			name: `
-		// POST / #4
-		// not correct url, correct body, empty contentType
-		// got status 400
-		// `,
-		// 			request: request{
-		// 				url:         "/12",
-		// 				body:        "https://www.google.com/",
-		// 				contentType: "text/plain; charset=utf-8",
-		// 			},
-		// 			want: want{
-		// 				code:        400,
-		// 				contentType: "",
-		// 			},
-		// 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -113,9 +81,11 @@ got status 400
 			r := httptest.NewRequest(http.MethodPost, tt.url, body)
 			r.Header.Set("Content-Type", tt.contentType)
 			w := httptest.NewRecorder()
-			handlers.HandlerPost(w, r, string(flags.BaseURL), string(flags.FileStoragePath), st)
+
+			handlers.HandlerPost(w, r, flags.BaseURL, flags.FileStoragePath, st)
 			rez := w.Result()
 			defer rez.Body.Close()
+
 			assert.Equal(t, tt.want.code, rez.StatusCode)
 			assert.Equal(t, tt.want.contentType, rez.Header.Get("Content-Type"))
 
@@ -123,6 +93,7 @@ got status 400
 			require.NoError(t, err)
 			err = rez.Body.Close()
 			require.NoError(t, err)
+
 			if rez.StatusCode == 201 {
 				assert.NotEmpty(t, string(rezBody))
 			} else if rez.StatusCode == 400 {

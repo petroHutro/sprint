@@ -92,10 +92,11 @@ got status 400
 			st.SetDB(ctx, tt.want.link, tt.shortLink)
 			r := httptest.NewRequest(http.MethodGet, tt.request, nil)
 			w := httptest.NewRecorder()
-			handlers.HandlerGet(w, r, st)
 
+			handlers.HandlerGet(w, r, st)
 			rez := w.Result()
 			defer rez.Body.Close()
+
 			assert.Equal(t, tt.want.code, rez.StatusCode)
 			if rez.StatusCode == 307 {
 				assert.Contains(t, rez.Header, "Location")

@@ -79,41 +79,9 @@ got status 400
 				contentType: "",
 			},
 		},
-		// 		{
-		// 			name: `
-		// POST /api/shorten #3
-		// correct url, correct body, not correct contentType
-		// got status 400
-		// `,
-		// 			request: request{
-		// 				url:         "/api/shorten",
-		// 				body:        `{"url": "https://practicum.yandex.ru"}`,
-		// 				contentType: "text/plain",
-		// 			},
-		// 			want: want{
-		// 				code:        400,
-		// 				contentType: "",
-		// 			},
-		// 		},
-		// 		{
-		// 			name: `
-		// POST /api/shorten #4
-		// not correct url, correct body, correct contentType
-		// got status 400
-		// `,
-		// 			request: request{
-		// 				url:         "/api",
-		// 				body:        `{"url": "https://practicum.yandex.ru"}`,
-		// 				contentType: "application/json",
-		// 			},
-		// 			want: want{
-		// 				code:        400,
-		// 				contentType: "",
-		// 			},
-		// 		},
 		{
 			name: `
-POST /api/shorten #5
+POST /api/shorten #3
 correct url, not correct body (not correct key), correct contentType
 got status 400
 `,
@@ -134,9 +102,11 @@ got status 400
 			r := httptest.NewRequest(http.MethodPost, tt.url, body)
 			r.Header.Set("Content-Type", tt.contentType)
 			w := httptest.NewRecorder()
-			handlers.HandlerPostAPI(w, r, string(flags.BaseURL), "", st)
+
+			handlers.HandlerPostAPI(w, r, flags.BaseURL, "", st)
 			rez := w.Result()
 			defer rez.Body.Close()
+
 			assert.Equal(t, tt.want.code, rez.StatusCode)
 			assert.Equal(t, tt.want.contentType, rez.Header.Get("Content-Type"))
 
@@ -144,6 +114,7 @@ got status 400
 			require.NoError(t, err)
 			err = rez.Body.Close()
 			require.NoError(t, err)
+
 			if rez.StatusCode == 201 {
 				assert.NotEmpty(t, string(rezBody))
 			} else if rez.StatusCode == 400 {

@@ -9,7 +9,11 @@ import (
 	"strings"
 )
 
-type BaseURL string
+// type BaseURL string
+
+type URLBase struct {
+	BaseURL string
+}
 
 type Logger struct {
 	FilePath  string
@@ -28,7 +32,7 @@ type NetAddress struct {
 }
 
 type Flags struct {
-	BaseURL
+	URLBase
 	NetAddress
 	Logger
 	Storage
@@ -36,7 +40,7 @@ type Flags struct {
 
 func NewFlags() Flags {
 	return Flags{
-		BaseURL: "http://localhost:8080",
+		URLBase: URLBase{""},
 		NetAddress: NetAddress{
 			Host: "localhost",
 			Port: 8080,
@@ -66,7 +70,8 @@ func parseENV(flags *Flags) {
 		flags.NetAddress.Set(serverAddress)
 	}
 	if baseURL := os.Getenv("BASE_URL"); baseURL != "" {
-		flags.BaseURL.Set(baseURL)
+		flags.BaseURL = baseURL
+		// flags.BaseURL.Set(baseURL)
 	}
 	if fileLoggerPath := os.Getenv("LOGGER_FILE"); fileLoggerPath != "" {
 		flags.FilePath = fileLoggerPath
@@ -82,7 +87,8 @@ func parseENV(flags *Flags) {
 func parseFlags() *Flags {
 	flags := NewFlags()
 	flag.Var(&flags.NetAddress, "a", "address and port to run server")
-	flag.Var(&flags.BaseURL, "b", "BaseUrl")
+	// flag.Var(&flags.BaseURL, "b", "BaseUrl")
+	flag.StringVar(&flags.BaseURL, "b", "http://localhost:8080", "BaseUrl")
 	flag.StringVar(&flags.FileStoragePath, "f", "/tmp/short-url-db.json", "FileStoragePath")
 	flag.StringVar(&flags.DatabaseDSN, "d", "", "DatabaseDSN")
 	flag.BoolVar(&flags.Logger.FileFlag, "l", false, "Logger only file")
@@ -91,14 +97,14 @@ func parseFlags() *Flags {
 	return &flags
 }
 
-func (a BaseURL) String() string {
-	return string(a)
-}
+// func (a BaseURL) String() string {
+// 	return string(a)
+// }
 
-func (a *BaseURL) Set(s string) error {
-	*a = BaseURL(s)
-	return nil
-}
+// func (a *BaseURL) Set(s string) error {
+// 	*a = BaseURL(s)
+// 	return nil
+// }
 
 func (a NetAddress) String() string {
 	return a.Host + ":" + strconv.Itoa(a.Port)

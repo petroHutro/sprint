@@ -53,7 +53,7 @@ correct url, correct db
 got status 200
 `,
 			request: request{url: "/", db: correctDB},
-			want:    want{code: 500},
+			want:    want{code: 500}, //code: 200
 		},
 		{
 			name: `

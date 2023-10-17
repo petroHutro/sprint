@@ -117,9 +117,11 @@ got status 400
 			r := httptest.NewRequest(http.MethodPost, tt.url, body)
 			r.Header.Set("Content-Type", tt.contentType)
 			w := httptest.NewRecorder()
-			handlers.HandlerPostBatch(w, r, string(flags.BaseURL), "", st)
+
+			handlers.HandlerPostBatch(w, r, flags.BaseURL, "", st)
 			rez := w.Result()
 			defer rez.Body.Close()
+
 			assert.Equal(t, tt.want.code, rez.StatusCode)
 			assert.Equal(t, tt.want.contentType, rez.Header.Get("Content-Type"))
 
@@ -127,6 +129,7 @@ got status 400
 			require.NoError(t, err)
 			err = rez.Body.Close()
 			require.NoError(t, err)
+
 			if rez.StatusCode == 201 {
 				assert.NotEmpty(t, string(rezBody))
 			} else if rez.StatusCode == 400 {
