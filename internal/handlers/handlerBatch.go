@@ -50,15 +50,10 @@ func HandlerPostBatch(w http.ResponseWriter, r *http.Request, baseAddress, file 
 	statusCode := http.StatusCreated
 	if err := db.SetAllDB(r.Context(), longs); err != nil {
 		var repErr *storage.RepError
-		if errors.As(err, &repErr) {
+		if errors.As(err, &repErr) && repErr.Repetition {
 			statusCode = http.StatusConflict
 			logger.Log.Error("long already db :%v", err)
 		} else {
-			// repErr, ok := err.(*storage.RepError)
-			// if ok && repErr.Repetition {
-			// 	statusCode = http.StatusConflict
-			// 	logger.Log.Error("long already db :%v", err)
-			// } else {
 			logger.Log.Error("cannot set all: %v", err)
 			w.WriteHeader(http.StatusBadRequest)
 			return

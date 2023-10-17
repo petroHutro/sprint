@@ -62,7 +62,8 @@ func (m *memeryBase) SetAllDB(ctx context.Context, data []string) error {
 		shortLink := utils.GetShortLink()
 		err := m.SetDB(ctx, v, shortLink)
 		if err != nil {
-			if repErr, ok := err.(*RepError); ok && repErr.Repetition {
+			var repErr *RepError
+			if errors.As(err, &repErr) {
 				repetition = true
 			} else {
 				return fmt.Errorf("cannot set: %w", err)

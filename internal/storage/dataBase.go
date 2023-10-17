@@ -116,21 +116,6 @@ func (d *dataBase) SetAllDB(ctx context.Context, data []string) error {
 				tx.Rollback()
 				return fmt.Errorf("cannot exec: %w", err)
 			}
-
-			// if repErr, ok := err.(*RepError); ok && repErr.Repetition {
-			// 	repetition = true
-			// } else {
-			// 	tx.Rollback()
-			// 	return fmt.Errorf("cannot exec: %w", err)
-			// }
-
-			// var pgErr *pgconn.PgError
-			// if errors.As(err, &pgErr) && pgerrcode.IsIntegrityConstraintViolation(pgErr.Code) {
-			// 	repetition = true
-			// } else {
-			// 	tx.Rollback()
-			// 	return fmt.Errorf("cannot exec: %w", err)
-			// }
 		}
 	}
 	if err := tx.Commit(); err != nil {
