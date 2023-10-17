@@ -38,11 +38,13 @@ func newDataBase(databaseDSN string) (*dataBase, error) {
 	if err != nil {
 		return nil, fmt.Errorf("cannot connection database: %w", err)
 	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 	if err := db.PingContext(ctx); err != nil {
 		return nil, fmt.Errorf("cannot ping database: %w", err)
 	}
+
 	return &dataBase{db: db}, nil
 }
 

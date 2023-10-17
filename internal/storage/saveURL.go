@@ -12,6 +12,7 @@ func saveURL(long, short, fname string) error {
 		return fmt.Errorf("cannot open file: %w", err)
 	}
 	defer file.Close()
+
 	dataURL := URL{LongURL: long, ShortURL: short}
 	encoder := json.NewEncoder(file)
 	err = encoder.Encode(dataURL)

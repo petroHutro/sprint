@@ -15,6 +15,7 @@ func (m *memeryBase) LoadURL(fname string) error {
 		return fmt.Errorf("cannot open file with url: %w", err)
 	}
 	defer file.Close()
+
 	decoder := json.NewDecoder(file)
 	for {
 		var url URL

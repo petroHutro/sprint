@@ -29,6 +29,7 @@ func (s *StorageBase) createTable(ctx context.Context) error {
 			END IF;
 		END $$;
 	`)
+
 	if err != nil {
 		return fmt.Errorf("cannot request create table: %w", err)
 	}
@@ -51,7 +52,6 @@ func InitStorage(conf *config.Storage) (*StorageBase, error) {
 		if err := storageBase.createTable(ctx); err != nil {
 			return nil, fmt.Errorf("cannot create table: %w", err)
 		}
-
 		return &storageBase, nil
 	} else {
 		db := newMemeryBase()
@@ -60,6 +60,7 @@ func InitStorage(conf *config.Storage) (*StorageBase, error) {
 				return nil, fmt.Errorf("cannot create memery base: %w", err)
 			}
 		}
+
 		memery := base(db)
 		basePointer := baseWithPointer(nil)
 		storageBase := StorageBase{memery, basePointer}

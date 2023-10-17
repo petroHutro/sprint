@@ -15,7 +15,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestHandlerPostAPI(t *testing.T) {
+func TestHandlerPostBatch(t *testing.T) {
 	flags := config.NewFlags()
 	log := config.Logger{
 		FilePath:  "file.log",
@@ -54,8 +54,22 @@ correct url, correct body, correct contentType
 got status 201
 `,
 			request: request{
-				url:         "/api/shorten",
-				body:        `{"url": "https://practicum.yandex.ru"}`,
+				url: "/api/shorten",
+				body: `
+				[
+					{
+						"correlation_id": "1",
+						"original_url": "123456789-"
+					},
+					{
+						"correlation_id": "2",
+						"original_url": "98765432-1"
+					},
+					{
+						"correlation_id": "3",
+						"original_url": "010101010101-01"
+					}
+				]`,
 				contentType: "application/json",
 			},
 			want: want{
@@ -79,41 +93,9 @@ got status 400
 				contentType: "",
 			},
 		},
-		// 		{
-		// 			name: `
-		// POST /api/shorten #3
-		// correct url, correct body, not correct contentType
-		// got status 400
-		// `,
-		// 			request: request{
-		// 				url:         "/api/shorten",
-		// 				body:        `{"url": "https://practicum.yandex.ru"}`,
-		// 				contentType: "text/plain",
-		// 			},
-		// 			want: want{
-		// 				code:        400,
-		// 				contentType: "",
-		// 			},
-		// 		},
-		// 		{
-		// 			name: `
-		// POST /api/shorten #4
-		// not correct url, correct body, correct contentType
-		// got status 400
-		// `,
-		// 			request: request{
-		// 				url:         "/api",
-		// 				body:        `{"url": "https://practicum.yandex.ru"}`,
-		// 				contentType: "application/json",
-		// 			},
-		// 			want: want{
-		// 				code:        400,
-		// 				contentType: "",
-		// 			},
-		// 		},
 		{
 			name: `
-POST /api/shorten #5
+POST /api/shorten #3
 correct url, not correct body (not correct key), correct contentType
 got status 400
 `,
@@ -128,13 +110,14 @@ got status 400
 			},
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			body := strings.NewReader(tt.body)
 			r := httptest.NewRequest(http.MethodPost, tt.url, body)
 			r.Header.Set("Content-Type", tt.contentType)
 			w := httptest.NewRecorder()
-			handlers.HandlerPostAPI(w, r, string(flags.BaseURL), "", st)
+			handlers.HandlerPostBatch(w, r, string(flags.BaseURL), "", st)
 			rez := w.Result()
 			defer rez.Body.Close()
 			assert.Equal(t, tt.want.code, rez.StatusCode)

@@ -15,12 +15,15 @@ func Run() error {
 		logger.Panic(err.Error())
 	}
 	defer logger.Shutdown()
+
 	storage, err := storage.InitStorage(&conf.Storage)
 	if err != nil {
 		logger.Panic(err.Error())
 	}
+
 	r := router.Create(conf, storage)
 	address := conf.Host + ":" + strconv.Itoa(conf.Port)
 	logger.Info("Running server: address:%s port:%d", conf.Host, conf.Port)
+
 	return http.ListenAndServe(address, r)
 }
