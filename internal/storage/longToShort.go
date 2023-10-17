@@ -10,10 +10,14 @@ import (
 func (s *StorageBase) LongToShort(ctx context.Context, link, fname string) error {
 	shortLink := utils.GetShortLink()
 	if err := s.SetDB(ctx, link, shortLink); err != nil {
-		if repErr, ok := err.(*RepError); ok && repErr.Repetition {
-			return &RepError{Err: errors.New("key already DB"), Repetition: true}
-			// repetition = true
+		var repErr *RepError
+		if errors.As(err, &repErr) {
+			return fmt.Errorf("key already DB: %w", err)
 		} else {
+			// if repErr, ok := err.(*RepError); ok && repErr.Repetition {
+			// 	return &RepError{Err: errors.New("key already DB"), Repetition: true}
+			// repetition = true
+			// } else {
 			return fmt.Errorf("cannot set: %w", err)
 		}
 	}
