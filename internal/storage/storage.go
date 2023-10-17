@@ -32,12 +32,15 @@ type base interface {
 func (s *StorageBase) PingDB() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
-	if _, ok := s.base.(*dataBase); ok {
-		db := s.get()
-		if err := db.PingContext(ctx); err != nil {
-			return fmt.Errorf("cannot ping: %w", err)
+
+	if s != nil {
+		if _, ok := s.base.(*dataBase); ok {
+			db := s.get()
+			if err := db.PingContext(ctx); err != nil {
+				return fmt.Errorf("cannot ping: %w", err)
+			}
+			return nil
 		}
-		return nil
 	}
 	return errors.New("not flag database, database empty")
 }

@@ -120,12 +120,15 @@ func (d *dataBase) SetAllDB(ctx context.Context, data []string) error {
 			}
 		}
 	}
+
 	if err := tx.Commit(); err != nil {
 		tx.Rollback()
 		return fmt.Errorf("transaction commit failed: %w", err)
 	}
+
 	if repetition {
 		return NewErrorRep(errors.New("long already db"), repetition)
 	}
+
 	return nil
 }
