@@ -11,7 +11,7 @@ import (
 func HandlerPost(w http.ResponseWriter, r *http.Request, baseAddress, file string, db *storage.StorageBase) {
 	link, err := io.ReadAll(r.Body)
 	if err != nil || len(link) == 0 {
-		logger.Log.Error("Post not body %v", err)
+		logger.Error("Post not body %v", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -22,9 +22,9 @@ func HandlerPost(w http.ResponseWriter, r *http.Request, baseAddress, file strin
 		var repErr *storage.RepError
 		if errors.As(err, &repErr) && repErr.Repetition {
 			statusCode = http.StatusConflict
-			logger.Log.Error("long already db :%v", err)
+			logger.Error("long already db :%v", err)
 		} else {
-			logger.Log.Error("cannot convert long to short :%v", err)
+			logger.Error("cannot convert long to short :%v", err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}

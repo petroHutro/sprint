@@ -22,9 +22,9 @@ func TestHandlerPostAPI(t *testing.T) {
 		MultiFlag: false,
 	}
 	if err := logger.InitLogger(log); err != nil {
-		logger.Log.Panic(err.Error())
+		logger.Panic(err.Error())
 	}
-	defer logger.Log.Shutdown()
+	defer logger.Shutdown()
 
 	confData := config.Storage{
 		FileStoragePath: "",

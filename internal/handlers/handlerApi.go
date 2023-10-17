@@ -23,17 +23,17 @@ func HandlerPostAPI(w http.ResponseWriter, r *http.Request, baseAddress, file st
 
 	_, err := buf.ReadFrom(r.Body)
 	if err != nil {
-		logger.Log.Error("PostAPI not body :%v", err)
+		logger.Error("PostAPI not body :%v", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	if err = json.Unmarshal(buf.Bytes(), &data); err != nil {
-		logger.Log.Error("PostAPI not byte to json :%v", err)
+		logger.Error("PostAPI not byte to json :%v", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	if data.URL == "" {
-		logger.Log.Error("PostAPI not url :%v", err)
+		logger.Error("PostAPI not url :%v", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -43,9 +43,9 @@ func HandlerPostAPI(w http.ResponseWriter, r *http.Request, baseAddress, file st
 		var repErr *storage.RepError
 		if errors.As(err, &repErr) && repErr.Repetition {
 			statusCode = http.StatusConflict
-			logger.Log.Error("long already db :%v", err)
+			logger.Error("long already db :%v", err)
 		} else {
-			logger.Log.Error("cannot convert long to short :%v", err)
+			logger.Error("cannot convert long to short :%v", err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -54,7 +54,7 @@ func HandlerPostAPI(w http.ResponseWriter, r *http.Request, baseAddress, file st
 	dataResp := DataRespAPI{Result: baseAddress + "/" + db.GetShort(r.Context(), data.URL)}
 	resp, err := json.Marshal(dataResp)
 	if err != nil {
-		logger.Log.Error("PostAPI not json to byte :%v", err)
+		logger.Error("PostAPI not json to byte :%v", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}

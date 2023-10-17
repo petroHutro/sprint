@@ -28,13 +28,13 @@ func GzipMiddleware(next http.Handler) http.Handler {
 		if sendsGzip {
 			cr, err := newCompressReader(r.Body)
 			if err != nil {
-				logger.Log.Error("GzipMiddleware not body:%v", err)
+				logger.Error("GzipMiddleware not body:%v", err)
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
 			data, err := io.ReadAll(cr)
 			if err != nil {
-				logger.Log.Error("GzipMiddleware cannot read body:%v", err)
+				logger.Error("GzipMiddleware cannot read body:%v", err)
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
@@ -44,7 +44,7 @@ func GzipMiddleware(next http.Handler) http.Handler {
 			} else if utils.IsText(data) {
 				r.Header.Set("Content-Type", "text/plain")
 			} else {
-				logger.Log.Error("GzipMiddleware not correct content type:%v", err)
+				logger.Error("GzipMiddleware not correct content type:%v", err)
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}

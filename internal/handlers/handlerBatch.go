@@ -25,13 +25,13 @@ func HandlerPostBatch(w http.ResponseWriter, r *http.Request, baseAddress, file 
 
 	_, err := buf.ReadFrom(r.Body)
 	if err != nil {
-		logger.Log.Error("PostBatch not body: %v", err)
+		logger.Error("PostBatch not body: %v", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	if err = json.Unmarshal(buf.Bytes(), &data); err != nil {
-		logger.Log.Error("PostBatch not byte to json: %v", err)
+		logger.Error("PostBatch not byte to json: %v", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -40,7 +40,7 @@ func HandlerPostBatch(w http.ResponseWriter, r *http.Request, baseAddress, file 
 
 	for _, item := range data {
 		if item.ID == "" || item.Long == "" {
-			logger.Log.Error("PostBatch not correlation_id or original_url: %v", err)
+			logger.Error("PostBatch not correlation_id or original_url: %v", err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -52,9 +52,9 @@ func HandlerPostBatch(w http.ResponseWriter, r *http.Request, baseAddress, file 
 		var repErr *storage.RepError
 		if errors.As(err, &repErr) && repErr.Repetition {
 			statusCode = http.StatusConflict
-			logger.Log.Error("long already db :%v", err)
+			logger.Error("long already db :%v", err)
 		} else {
-			logger.Log.Error("cannot set all: %v", err)
+			logger.Error("cannot set all: %v", err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -70,7 +70,7 @@ func HandlerPostBatch(w http.ResponseWriter, r *http.Request, baseAddress, file 
 
 	resp, err := json.Marshal(dataResp)
 	if err != nil {
-		logger.Log.Error("PostAPI not json to byte :%v", err)
+		logger.Error("PostAPI not json to byte :%v", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}

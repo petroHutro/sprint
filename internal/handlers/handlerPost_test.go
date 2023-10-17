@@ -18,9 +18,9 @@ import (
 func Test_requestPost(t *testing.T) {
 	flags := config.NewFlags()
 	if err := logger.InitLogger(flags.Logger); err != nil {
-		logger.Log.Panic(err.Error())
+		logger.Panic(err.Error())
 	}
-	defer logger.Log.Shutdown()
+	defer logger.Shutdown()
 
 	confData := config.Storage{
 		FileStoragePath: "",

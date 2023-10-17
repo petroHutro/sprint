@@ -8,7 +8,7 @@ import (
 
 func HandlerPing(w http.ResponseWriter, r *http.Request, db *storage.StorageBase) {
 	if err := db.PingDB(); err != nil {
-		logger.Log.Error("cannot ping %v", err)
+		logger.Error("cannot ping %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

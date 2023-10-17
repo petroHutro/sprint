@@ -9,13 +9,13 @@ import (
 func HandlerGet(w http.ResponseWriter, r *http.Request, db *storage.StorageBase) {
 	shortLink := r.URL.String()[1:]
 	if shortLink == "" {
-		logger.Log.Error("shortLink is emty")
+		logger.Error("shortLink is emty")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	link, err := db.ShortToLong(r.Context(), shortLink)
 	if err != nil {
-		logger.Log.Error("cannot convert short to long :%v", err)
+		logger.Error("cannot convert short to long :%v", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
