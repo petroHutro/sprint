@@ -17,14 +17,14 @@ func (s *StorageBase) createTable(ctx context.Context) error {
 	defer tx.Rollback()
 
 	_, err = tx.ExecContext(ctx, `
-		DO $$ 
+		DO $$
 		BEGIN
 			IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'links') THEN
 				CREATE TABLE links (
 					id SERIAL PRIMARY KEY,
 					long  TEXT NOT NULL,
 					short TEXT NOT NULL,
-					user INT NOT NULL,
+					user_id INT NOT NULL,
 					UNIQUE (long)
 				);
 			END IF;
@@ -38,6 +38,10 @@ func (s *StorageBase) createTable(ctx context.Context) error {
 	// _, _ = tx.ExecContext(ctx, `
 	// 		ALTER TABLE links
 	// 		ADD user INT NOT NULL;
+	// `)
+
+	// _, _ = tx.ExecContext(ctx, `
+	// 	DROP TABLE links ;
 	// `)
 
 	return tx.Commit()

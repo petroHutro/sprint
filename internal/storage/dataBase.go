@@ -79,7 +79,7 @@ func (d *dataBase) GetShort(ctx context.Context, key string) string {
 func (d *dataBase) SetDB(ctx context.Context, key, val string, id int) error {
 	_, err := d.db.ExecContext(ctx, `
 		INSERT INTO links
-		(long, short, user)
+		(long, short, user_id)
 		VALUES
 		($1, $2, $3);
 	`, key, val, id)
@@ -105,7 +105,7 @@ func (d *dataBase) SetAllDB(ctx context.Context, data []string, id int) error {
 		shortLink := utils.GetShortLink()
 		_, err := tx.ExecContext(ctx, `
 			INSERT INTO links
-			(long, short, user)
+			(long, short, user_id)
 			VALUES
 			($1, $2, $3);
     	`, v, shortLink, id)
@@ -134,7 +134,7 @@ func (d *dataBase) SetAllDB(ctx context.Context, data []string, id int) error {
 }
 
 func (d *dataBase) GetAllDB(ctx context.Context, id int) ([]Urls, error) {
-	rows, err := d.db.QueryContext(ctx, "SELECT long, short FROM links WHERE user = $1", id)
+	rows, err := d.db.QueryContext(ctx, "SELECT long, short FROM links WHERE user_id = $1", id)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -168,7 +168,7 @@ func (d *dataBase) GetAllDB(ctx context.Context, id int) ([]Urls, error) {
 
 func (d *dataBase) GetLastID(ctx context.Context) int {
 	row := d.db.QueryRowContext(ctx, `
-		SELECT MAX(user) FROM links`)
+		SELECT MAX(user_id) FROM links`)
 
 	var userID int
 	err := row.Scan(&userID)
