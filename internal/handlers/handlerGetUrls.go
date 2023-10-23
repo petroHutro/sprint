@@ -12,7 +12,7 @@ func HandlerGetUrls(w http.ResponseWriter, r *http.Request, db *storage.StorageB
 	_, err := r.Cookie("Authorization")
 	if err != nil {
 		logger.Error("cookies do not contain a token: %v", err)
-		w.WriteHeader(http.StatusNoContent)
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 	userID := r.Header.Get("User_id")
