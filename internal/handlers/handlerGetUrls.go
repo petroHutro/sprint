@@ -8,11 +8,16 @@ import (
 	"strconv"
 )
 
+type RespGetUrls struct {
+	Short string `json:"short_url"`
+	Long  string `json:"original_url"`
+}
+
 func HandlerGetUrls(w http.ResponseWriter, r *http.Request, db *storage.StorageBase) {
 	_, err := r.Cookie("Authorization")
 	if err != nil {
 		logger.Error("cookies do not contain a token: %v", err)
-		w.WriteHeader(http.StatusUnauthorized)
+		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 	userID := r.Header.Get("User_id")
@@ -25,10 +30,10 @@ func HandlerGetUrls(w http.ResponseWriter, r *http.Request, db *storage.StorageB
 		return
 	}
 
-	var dataResp []storage.Urls
+	var dataResp []RespGetUrls
 
 	for _, url := range urls {
-		dataResp = append(dataResp, storage.Urls{
+		dataResp = append(dataResp, RespGetUrls{
 			Long:  url.Long,
 			Short: url.Short,
 		})
