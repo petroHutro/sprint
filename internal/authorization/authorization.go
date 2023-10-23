@@ -68,15 +68,15 @@ func AuthorizationMiddleware(next http.Handler) http.Handler {
 		if err != nil {
 			logger.Error("cookies do not contain a token: %v", err)
 			setAuthorization(&w)
-			w.WriteHeader(http.StatusUnauthorized)
-			return
+			// w.WriteHeader(http.StatusUnauthorized)
+			// return
 		}
 		id, err := getUserID(cookie.Value)
 		if err != nil {
 			logger.Error("token does not pass validation")
 			setAuthorization(&w)
-			w.WriteHeader(http.StatusUnauthorized)
-			return
+			// w.WriteHeader(http.StatusUnauthorized)
+			// return
 		}
 		r.Header.Set("User_id", strconv.Itoa(id))
 		next.ServeHTTP(w, r)
