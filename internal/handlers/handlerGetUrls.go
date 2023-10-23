@@ -13,7 +13,7 @@ type RespGetUrls struct {
 	Long  string `json:"original_url"`
 }
 
-func HandlerGetUrls(w http.ResponseWriter, r *http.Request, db *storage.StorageBase) {
+func HandlerGetUrls(w http.ResponseWriter, r *http.Request, baseAddress string, db *storage.StorageBase) {
 	_, err := r.Cookie("Authorization")
 	if err != nil {
 		logger.Error("cookies do not contain a token: %v", err)
@@ -35,7 +35,7 @@ func HandlerGetUrls(w http.ResponseWriter, r *http.Request, db *storage.StorageB
 	for _, url := range urls {
 		dataResp = append(dataResp, RespGetUrls{
 			Long:  url.Long,
-			Short: url.Short,
+			Short: baseAddress + "/" + url.Short,
 		})
 	}
 

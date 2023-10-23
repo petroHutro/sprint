@@ -44,7 +44,7 @@ func Create(flags *config.Flags, db *storage.StorageBase) *chi.Mux {
 			handlers.HandlerPostBatch(w, r, flags.BaseURL, flags.FileStoragePath, db)
 		})
 		r.Get("/user/urls", func(w http.ResponseWriter, r *http.Request) {
-			handlers.HandlerGetUrls(w, r, db)
+			handlers.HandlerGetUrls(w, r, flags.BaseURL, db)
 		})
 	})
 
