@@ -21,7 +21,7 @@ func HandlerGetUrls(w http.ResponseWriter, r *http.Request, db *storage.StorageB
 	urls, err := db.GetUrls(r.Context(), id)
 	if err != nil {
 		logger.Error("cannot get urls: %v", err)
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 
@@ -42,6 +42,6 @@ func HandlerGetUrls(w http.ResponseWriter, r *http.Request, db *storage.StorageB
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(http.StatusOK)
 	w.Write(resp)
 }
