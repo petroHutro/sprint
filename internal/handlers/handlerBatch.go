@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"sprint/internal/logger"
 	"sprint/internal/storage"
+	"strconv"
 )
 
 type DataReqBatch struct {
@@ -48,7 +49,13 @@ func HandlerPostBatch(w http.ResponseWriter, r *http.Request, baseAddress, file 
 	}
 
 	statusCode := http.StatusCreated
-	if err := db.SetAllDB(r.Context(), longs); err != nil {
+	id, err := strconv.Atoi(r.Header.Get("User_id"))
+	if err != nil {
+		logger.Error("bad user id: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	if err := db.SetAllDB(r.Context(), longs, id); err != nil {
 		var repErr *storage.RepError
 		if errors.As(err, &repErr) && repErr.Repetition {
 			statusCode = http.StatusConflict

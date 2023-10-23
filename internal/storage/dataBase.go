@@ -76,13 +76,13 @@ func (d *dataBase) GetShort(ctx context.Context, key string) string {
 	return short
 }
 
-func (d *dataBase) SetDB(ctx context.Context, key, val string) error {
+func (d *dataBase) SetDB(ctx context.Context, key, val string, id int) error {
 	_, err := d.db.ExecContext(ctx, `
 		INSERT INTO links
-		(long, short)
+		(long, short, user)
 		VALUES
-		($1, $2);
-	`, key, val)
+		($1, $2, $3);
+	`, key, val, id)
 
 	if err != nil {
 		var pgErr *pgconn.PgError
@@ -94,7 +94,7 @@ func (d *dataBase) SetDB(ctx context.Context, key, val string) error {
 	return nil
 }
 
-func (d *dataBase) SetAllDB(ctx context.Context, data []string) error {
+func (d *dataBase) SetAllDB(ctx context.Context, data []string, id int) error {
 	repetition := false
 	tx, err := d.db.Begin()
 	if err != nil {
@@ -105,10 +105,10 @@ func (d *dataBase) SetAllDB(ctx context.Context, data []string) error {
 		shortLink := utils.GetShortLink()
 		_, err := tx.ExecContext(ctx, `
 			INSERT INTO links
-			(long, short)
+			(long, short, user)
 			VALUES
-			($1, $2);
-    	`, v, shortLink)
+			($1, $2, $3);
+    	`, v, shortLink, id)
 
 		if err != nil {
 			var pgErr *pgconn.PgError
@@ -131,4 +131,49 @@ func (d *dataBase) SetAllDB(ctx context.Context, data []string) error {
 	}
 
 	return nil
+}
+
+func (d *dataBase) GetAllDB(ctx context.Context, id int) ([]Urls, error) {
+	rows, err := d.db.QueryContext(ctx, "SELECT long, short FROM links WHERE user = $1", id)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, err //!!!! пусто
+		}
+		return nil, err
+	}
+	defer rows.Close()
+
+	var urls []Urls
+
+	for rows.Next() {
+		var long, short string
+
+		if err := rows.Scan(&long, &short); err != nil {
+			return nil, err
+		}
+
+		urls = append(urls, Urls{
+			Long:  long,
+			Short: short,
+		})
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return urls, nil
+}
+
+func (d *dataBase) GetLastID(ctx context.Context) int {
+	row := d.db.QueryRowContext(ctx, `
+		SELECT MAX(user) FROM links`)
+
+	var userID int
+	err := row.Scan(&userID)
+	if err != nil {
+		return -1
+	}
+	return userID
 }

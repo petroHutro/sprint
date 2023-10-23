@@ -11,6 +11,7 @@ import (
 type URL struct {
 	LongURL  string `json:"long"`
 	ShortURL string `json:"short"`
+	UserID   int    `json:"user"`
 }
 
 type StorageBase struct {
@@ -25,8 +26,10 @@ type baseWithPointer interface {
 type base interface {
 	GetShort(ctx context.Context, key string) string
 	GetLong(ctx context.Context, key string) string
-	SetDB(ctx context.Context, key, val string) error
-	SetAllDB(ctx context.Context, data []string) error
+	SetDB(ctx context.Context, key, val string, id int) error
+	SetAllDB(ctx context.Context, data []string, id int) error
+	GetAllDB(ctx context.Context, id int) ([]Urls, error)
+	GetLastID(ctx context.Context) int
 }
 
 func (s *StorageBase) PingDB() error {

@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"sprint/internal/logger"
 	"sprint/internal/storage"
+	"strconv"
 )
 
 type DataReqAPI struct {
@@ -37,7 +38,13 @@ func HandlerPostAPI(w http.ResponseWriter, r *http.Request, baseAddress, file st
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	err = db.LongToShort(r.Context(), data.URL, file)
+	id, err := strconv.Atoi(r.Header.Get("User_id"))
+	if err != nil {
+		logger.Error("bad user id: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	err = db.LongToShort(r.Context(), data.URL, file, id)
 	statusCode := http.StatusCreated
 	if err != nil {
 		var repErr *storage.RepError

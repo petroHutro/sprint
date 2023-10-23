@@ -24,6 +24,7 @@ func (s *StorageBase) createTable(ctx context.Context) error {
 					id SERIAL PRIMARY KEY,
 					long  TEXT NOT NULL,
 					short TEXT NOT NULL,
+					user INT NOT NULL,
 					UNIQUE (long)
 				);
 			END IF;
@@ -33,6 +34,12 @@ func (s *StorageBase) createTable(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("cannot request create table: %w", err)
 	}
+
+	// _, _ = tx.ExecContext(ctx, `
+	// 		ALTER TABLE links
+	// 		ADD user INT NOT NULL;
+	// `)
+
 	return tx.Commit()
 }
 

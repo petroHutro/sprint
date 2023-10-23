@@ -7,9 +7,9 @@ import (
 	"sprint/internal/utils"
 )
 
-func (s *StorageBase) LongToShort(ctx context.Context, link, fname string) error {
+func (s *StorageBase) LongToShort(ctx context.Context, link, fname string, id int) error {
 	shortLink := utils.GetShortLink()
-	if err := s.SetDB(ctx, link, shortLink); err != nil {
+	if err := s.SetDB(ctx, link, shortLink, id); err != nil {
 		var repErr *RepError
 		if errors.As(err, &repErr) && repErr.Repetition {
 			return fmt.Errorf("key already DB: %w", err)
@@ -19,7 +19,7 @@ func (s *StorageBase) LongToShort(ctx context.Context, link, fname string) error
 	}
 
 	if fname != "" {
-		if err := saveURL(link, shortLink, fname); err != nil {
+		if err := saveURL(link, shortLink, fname, id); err != nil {
 			return fmt.Errorf("cannot save url in file: %w", err)
 		}
 	}
