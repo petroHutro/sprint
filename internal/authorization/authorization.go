@@ -67,7 +67,10 @@ func AuthorizationMiddleware(next http.Handler) http.Handler {
 		cookie, err := r.Cookie("Authorization")
 		if err != nil {
 			logger.Error("cookies do not contain a token: %v", err)
-			setAuthorization(&w)
+			token, _ := buildJWTString()
+			cookie = &http.Cookie{Name: "Authorization", Value: token}
+			http.SetCookie(w, cookie)
+			// setAuthorization(&w)
 			// w.WriteHeader(http.StatusUnauthorized)
 			// return
 		}
