@@ -80,6 +80,7 @@ got status 400
 			body := strings.NewReader(tt.body)
 			r := httptest.NewRequest(http.MethodPost, tt.url, body)
 			r.Header.Set("Content-Type", tt.contentType)
+			r.Header.Set("User_id", "1")
 			w := httptest.NewRecorder()
 
 			handlers.HandlerPost(w, r, flags.BaseURL, flags.FileStoragePath, st)
