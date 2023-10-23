@@ -2,13 +2,13 @@ package authorization
 
 import (
 	"fmt"
+	"math/rand"
 	"net/http"
 	"sprint/internal/logger"
 	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/google/uuid"
 )
 
 type Claims struct {
@@ -20,12 +20,15 @@ const TOKEN_EXP = time.Hour * 3
 const SECRET_KEY = "supersecretkey"
 
 func buildJWTString() (string, error) {
-	id := uuid.New() // исправить проверка на наличие
+	source := rand.NewSource(time.Now().UnixNano())
+	generator := rand.New(source)
+	id := generator.Intn(2000000)
+	// id := uuid.New() // исправить проверка на наличие
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(TOKEN_EXP)),
 		},
-		UserID: int(id.ID()),
+		UserID: id,
 	})
 
 	tokenString, err := token.SignedString([]byte(SECRET_KEY))
