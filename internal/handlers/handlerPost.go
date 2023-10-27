@@ -38,5 +38,6 @@ func HandlerPost(w http.ResponseWriter, r *http.Request, baseAddress, file strin
 	}
 	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(statusCode)
-	w.Write([]byte(baseAddress + "/" + db.GetShort(r.Context(), string(link))))
+	short, _ := db.GetShort(r.Context(), string(link)) //!!!!!!!!!!!!!!!!!!!!
+	w.Write([]byte(baseAddress + "/" + short))
 }

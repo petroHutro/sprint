@@ -58,7 +58,8 @@ func HandlerPostAPI(w http.ResponseWriter, r *http.Request, baseAddress, file st
 		}
 	}
 
-	dataResp := DataRespAPI{Result: baseAddress + "/" + db.GetShort(r.Context(), data.URL)}
+	short, _ := db.GetShort(r.Context(), data.URL) //!!!!!!!!!!!!!!!!!!!!
+	dataResp := DataRespAPI{Result: baseAddress + "/" + short}
 	resp, err := json.Marshal(dataResp)
 	if err != nil {
 		logger.Error("PostAPI not json to byte :%v", err)

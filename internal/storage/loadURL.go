@@ -27,7 +27,7 @@ func (m *memeryBase) LoadURL(fname string) error {
 		ctx, cancel := context.WithTimeout(context.Background(),
 			time.Duration(time.Millisecond*500))
 		defer cancel()
-		m.SetDB(ctx, url.LongURL, url.ShortURL, url.UserID)
+		m.SetDB(ctx, url.LongURL, url.ShortURL, url.UserID, url.FlagDel)
 	}
 	return nil
 }

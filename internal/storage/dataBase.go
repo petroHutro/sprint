@@ -48,21 +48,26 @@ func newDataBase(databaseDSN string) (*dataBase, error) {
 	return &dataBase{db: db}, nil
 }
 
-func (d *dataBase) GetLong(ctx context.Context, key string) string {
+func (d *dataBase) GetLong(ctx context.Context, key string) (string, error) {
 	row := d.db.QueryRowContext(ctx, `
-	SELECT long FROM links WHERE short = $1`,
+	SELECT long, deleted FROM links WHERE short = $1`,
 		key,
 	)
 
 	var long string
-	err := row.Scan(&long)
+	var deleted bool
+	err := row.Scan(&long, &deleted)
 	if err != nil {
-		return ""
+		return "", nil
 	}
-	return long
+	// fmt.Println(key, long, deleted)
+	if deleted {
+		return "-1", nil
+	}
+	return long, nil
 }
 
-func (d *dataBase) GetShort(ctx context.Context, key string) string {
+func (d *dataBase) GetShort(ctx context.Context, key string) (string, error) {
 	row := d.db.QueryRowContext(ctx, `
 		SELECT short FROM links WHERE long = $1`,
 		key,
@@ -71,18 +76,18 @@ func (d *dataBase) GetShort(ctx context.Context, key string) string {
 	var short string
 	err := row.Scan(&short)
 	if err != nil {
-		return ""
+		return "", nil
 	}
-	return short
+	return short, nil
 }
 
-func (d *dataBase) SetDB(ctx context.Context, key, val string, id int) error {
+func (d *dataBase) SetDB(ctx context.Context, key, val string, id int, flag bool) error {
 	_, err := d.db.ExecContext(ctx, `
 		INSERT INTO links
-		(long, short, user_id)
+		(long, short, user_id, deleted)
 		VALUES
-		($1, $2, $3);
-	`, key, val, id)
+		($1, $2, $3, $4);
+	`, key, val, id, flag)
 
 	if err != nil {
 		var pgErr *pgconn.PgError
@@ -105,10 +110,10 @@ func (d *dataBase) SetAllDB(ctx context.Context, data []string, id int) error {
 		shortLink := utils.GetShortLink()
 		_, err := tx.ExecContext(ctx, `
 			INSERT INTO links
-			(long, short, user_id)
+			(long, short, user_id, deleted)
 			VALUES
-			($1, $2, $3);
-    	`, v, shortLink, id)
+			($1, $2, $3, $4);
+    	`, v, shortLink, id, false)
 
 		if err != nil {
 			var pgErr *pgconn.PgError
@@ -138,7 +143,7 @@ func (d *dataBase) GetAllDB(ctx context.Context, id int) ([]Urls, error) {
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, err //!!!! пусто
+			return nil, err //!!!! проверка на пусто
 		}
 		return nil, err
 	}
@@ -176,4 +181,19 @@ func (d *dataBase) GetLastID(ctx context.Context) int {
 		return -1
 	}
 	return userID
+}
+
+func (d *dataBase) DeleteS(ctx context.Context, id []int, shorts []string) error {
+	_, err := d.db.ExecContext(ctx, `
+		UPDATE links
+			SET deleted = CASE
+			WHEN user_id = ANY ($1) AND short = ANY ($2) THEN true
+			ELSE false
+		END
+	`, id, shorts)
+
+	if err != nil {
+		return fmt.Errorf("cannot set database: %w", err)
+	}
+	return nil
 }

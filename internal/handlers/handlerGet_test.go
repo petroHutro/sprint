@@ -89,7 +89,7 @@ got status 400
 		t.Run(tt.name, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 			defer cancel()
-			st.SetDB(ctx, tt.want.link, tt.shortLink, 1)
+			st.SetDB(ctx, tt.want.link, tt.shortLink, 1, false)
 			r := httptest.NewRequest(http.MethodGet, tt.request, nil)
 			w := httptest.NewRecorder()
 

@@ -19,6 +19,12 @@ func HandlerGet(w http.ResponseWriter, r *http.Request, db *storage.StorageBase)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+
+	if link == "-1" {
+		logger.Error("link alrege delete:%v", err)
+		w.WriteHeader(http.StatusGone)
+		return
+	}
 	w.Header().Set("Location", link)
 	w.WriteHeader(http.StatusTemporaryRedirect)
 }

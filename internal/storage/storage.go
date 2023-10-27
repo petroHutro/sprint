@@ -12,6 +12,12 @@ type URL struct {
 	LongURL  string `json:"long"`
 	ShortURL string `json:"short"`
 	UserID   int    `json:"user"`
+	FlagDel  bool   `json:"del"`
+}
+
+type QueryDelete struct {
+	ID   int
+	Data string
 }
 
 type StorageBase struct {
@@ -24,12 +30,13 @@ type baseWithPointer interface {
 }
 
 type base interface {
-	GetShort(ctx context.Context, key string) string
-	GetLong(ctx context.Context, key string) string
-	SetDB(ctx context.Context, key, val string, id int) error
+	GetShort(ctx context.Context, key string) (string, error)
+	GetLong(ctx context.Context, key string) (string, error)
+	SetDB(ctx context.Context, key, val string, id int, flag bool) error
 	SetAllDB(ctx context.Context, data []string, id int) error
 	GetAllDB(ctx context.Context, id int) ([]Urls, error)
 	GetLastID(ctx context.Context) int
+	DeleteS(ctx context.Context, id []int, shorts []string) error
 }
 
 func (s *StorageBase) PingDB() error {

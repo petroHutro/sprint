@@ -6,7 +6,7 @@ import (
 )
 
 func (s *StorageBase) ShortToLong(ctx context.Context, shortLink string) (string, error) {
-	if el := s.GetLong(ctx, shortLink); el != "" {
+	if el, err := s.GetLong(ctx, shortLink); el != "" && err == nil {
 		return el, nil
 	}
 	return "", errors.New("no short link")

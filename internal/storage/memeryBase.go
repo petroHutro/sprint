@@ -12,36 +12,48 @@ type memeryBase struct {
 	dbSL  map[string]string
 	dbLS  map[string]string
 	dbLID map[string]int
+	dbLF  map[string]bool
 	sm    sync.Mutex
 }
 
 func newMemeryBase() *memeryBase {
-	return &memeryBase{dbSL: make(map[string]string), dbLS: make(map[string]string), dbLID: make(map[string]int)}
-}
-
-func (m *memeryBase) GetShort(ctx context.Context, key string) string {
-	select {
-	case <-ctx.Done():
-		return ""
-	default:
-		m.sm.Lock()
-		defer m.sm.Unlock()
-		return m.dbLS[key]
+	return &memeryBase{
+		dbSL:  make(map[string]string),
+		dbLS:  make(map[string]string),
+		dbLID: make(map[string]int),
+		dbLF:  make(map[string]bool),
 	}
 }
 
-func (m *memeryBase) GetLong(ctx context.Context, key string) string {
+func (m *memeryBase) GetShort(ctx context.Context, key string) (string, error) {
 	select {
 	case <-ctx.Done():
-		return ""
+		return "", nil
 	default:
 		m.sm.Lock()
 		defer m.sm.Unlock()
-		return m.dbSL[key]
+		return m.dbLS[key], nil
 	}
 }
 
-func (m *memeryBase) SetDB(ctx context.Context, key, val string, id int) error {
+func (m *memeryBase) GetLong(ctx context.Context, key string) (string, error) {
+	select {
+	case <-ctx.Done():
+		return "", nil
+	default:
+		m.sm.Lock()
+		defer m.sm.Unlock()
+		if long, ok := m.dbSL[key]; ok {
+			if m.dbLF[long] {
+				return "-1", nil
+			}
+			return long, nil
+		}
+		return "", nil
+	}
+}
+
+func (m *memeryBase) SetDB(ctx context.Context, key, val string, id int, flag bool) error {
 	select {
 	case <-ctx.Done():
 		return errors.New("context cansel")
@@ -52,6 +64,7 @@ func (m *memeryBase) SetDB(ctx context.Context, key, val string, id int) error {
 			m.dbLS[key] = val
 			m.dbSL[val] = key
 			m.dbLID[key] = id
+			m.dbLF[key] = flag
 			return nil
 		}
 		return &RepError{Err: errors.New("key already DB"), Repetition: true}
@@ -62,7 +75,7 @@ func (m *memeryBase) SetAllDB(ctx context.Context, data []string, id int) error 
 	repetition := false
 	for _, v := range data {
 		shortLink := utils.GetShortLink()
-		err := m.SetDB(ctx, v, shortLink, id)
+		err := m.SetDB(ctx, v, shortLink, id, false)
 		if err != nil {
 			var repErr *RepError
 			if errors.As(err, &repErr) {
@@ -83,7 +96,8 @@ func (m *memeryBase) GetAllDB(ctx context.Context, id int) ([]Urls, error) {
 
 	for key, val := range m.dbLID {
 		if val == id {
-			urls = append(urls, Urls{Long: key, Short: m.GetShort(ctx, key)})
+			short, _ := m.GetShort(ctx, key) //!!!!!!!!!!!!!!!!!!!!!!!!!
+			urls = append(urls, Urls{Long: key, Short: short})
 		}
 	}
 	return urls, nil
@@ -98,4 +112,22 @@ func (m *memeryBase) GetLastID(ctx context.Context) int {
 		}
 	}
 	return max
+}
+
+func (m *memeryBase) DeleteS(ctx context.Context, id []int, shorts []string) error {
+	select {
+	case <-ctx.Done():
+		return errors.New("context cansel")
+	default:
+		m.sm.Lock()
+		defer m.sm.Unlock()
+		for i, value := range id {
+			if long, ok := m.dbSL[shorts[i]]; ok {
+				if m.dbLID[long] == value {
+					m.dbLF[long] = true
+				}
+			}
+		}
+	}
+	return nil
 }

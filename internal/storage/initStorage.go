@@ -25,6 +25,7 @@ func (s *StorageBase) createTable(ctx context.Context) error {
 					long  TEXT NOT NULL,
 					short TEXT NOT NULL,
 					user_id INT NOT NULL,
+					deleted BOOLEAN DEFAULT FALSE,
 					UNIQUE (long)
 				);
 			END IF;
