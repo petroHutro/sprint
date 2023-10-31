@@ -16,7 +16,7 @@ func HandlerPost(w http.ResponseWriter, r *http.Request, baseAddress, file strin
 		return
 	}
 	defer r.Body.Close()
-	// id, err := strconv.Atoi(r.Header.Get("User_id"))
+
 	id := r.Header.Get("User_id")
 	if id == "" {
 		logger.Error("bad user id")
@@ -38,6 +38,6 @@ func HandlerPost(w http.ResponseWriter, r *http.Request, baseAddress, file strin
 	}
 	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(statusCode)
-	short, _ := db.GetShort(r.Context(), string(link)) //!!!!!!!!!!!!!!!!!!!!
+	short, _ := db.GetShort(r.Context(), string(link))
 	w.Write([]byte(baseAddress + "/" + short))
 }

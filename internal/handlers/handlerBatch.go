@@ -69,7 +69,7 @@ func HandlerPostBatch(w http.ResponseWriter, r *http.Request, baseAddress, file 
 	var dataResp []DataRespBatch
 
 	for _, item := range data {
-		short, _ := db.GetShort(r.Context(), item.Long) //!!!!!!!!!!!!!!!!!!!!
+		short, _ := db.GetShort(r.Context(), item.Long)
 		dataResp = append(dataResp, DataRespBatch{
 			ID:    item.ID,
 			Short: baseAddress + "/" + short})

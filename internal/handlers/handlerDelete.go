@@ -28,7 +28,7 @@ func HandlerDelete(w http.ResponseWriter, r *http.Request, delChan chan storage.
 	}
 
 	id := r.Header.Get("User_id")
-	// id, _ := strconv.Atoi(userID)
+
 	if id == "" {
 		logger.Error("bad user id")
 		w.WriteHeader(http.StatusBadRequest)

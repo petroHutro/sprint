@@ -37,7 +37,7 @@ func HandlerPostAPI(w http.ResponseWriter, r *http.Request, baseAddress, file st
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	// id, err := strconv.Atoi(r.Header.Get("User_id"))
+
 	id := r.Header.Get("User_id")
 	if id == "" {
 		logger.Error("bad user id: %v", err)
@@ -58,7 +58,7 @@ func HandlerPostAPI(w http.ResponseWriter, r *http.Request, baseAddress, file st
 		}
 	}
 
-	short, _ := db.GetShort(r.Context(), data.URL) //!!!!!!!!!!!!!!!!!!!!
+	short, _ := db.GetShort(r.Context(), data.URL)
 	dataResp := DataRespAPI{Result: baseAddress + "/" + short}
 	resp, err := json.Marshal(dataResp)
 	if err != nil {

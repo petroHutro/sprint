@@ -17,6 +17,8 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
+type QD = storage.QueryDelete
+
 type App struct {
 	conf         *config.Flags
 	db           *storage.StorageBase
@@ -56,8 +58,6 @@ func (a *App) FlushDelete() {
 	}
 }
 
-type QD = storage.QueryDelete
-
 func newApp() (*App, error) {
 	conf := config.LoadServerConfigure()
 	if err := logger.InitLogger(conf.Logger); err != nil {
@@ -78,7 +78,7 @@ func newApp() (*App, error) {
 
 func (a *App) createMiddlewareHandlers() {
 	a.router.Use(logger.LoggingMiddleware)
-	a.router.Use(authorization.AuthorizationMiddleware)
+	a.router.Use(authorization.AuthorizationMiddleware(a.conf.SecretKey, a.conf.TokenEXP))
 	a.router.Use(compression.GzipMiddleware)
 }
 
