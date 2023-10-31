@@ -189,7 +189,7 @@ func (d *dataBase) GetAll(ctx context.Context) ([]URL, error) {
 		var userID string
 		var del bool
 
-		if err := rows.Scan(&long, &short); err != nil {
+		if err := rows.Scan(&long, &short, userID, del); err != nil {
 			return nil, err
 		}
 
