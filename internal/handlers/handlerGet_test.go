@@ -40,6 +40,7 @@ func Test_requestGet(t *testing.T) {
 		request   string
 		shortLink string
 		link      string
+		flagB     bool
 		want      want
 	}{
 		{
@@ -51,6 +52,7 @@ got status 307
 			request:   "/19",
 			shortLink: "19",
 			link:      "123456789",
+			flagB:     false,
 			want: want{
 				code: 307,
 				link: "123456789",
@@ -65,6 +67,7 @@ got status 400
 			request:   "/",
 			shortLink: "",
 			link:      "",
+			flagB:     false,
 			want: want{
 				code: 400,
 				link: "",
@@ -79,8 +82,24 @@ got status 400
 			request:   "/1234",
 			shortLink: "123",
 			link:      "123",
+			flagB:     false,
 			want: want{
 				code: 400,
+				link: "",
+			},
+		},
+		{
+			name: `
+GET #4
+delete url,
+got status 400
+`,
+			request:   "/199",
+			shortLink: "199",
+			link:      "1234567890",
+			flagB:     true,
+			want: want{
+				code: 410,
 				link: "",
 			},
 		},
@@ -89,7 +108,7 @@ got status 400
 		t.Run(tt.name, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 			defer cancel()
-			st.Set(ctx, tt.want.link, tt.shortLink, "1", false)
+			st.Set(ctx, tt.link, tt.shortLink, "1", tt.flagB)
 			r := httptest.NewRequest(http.MethodGet, tt.request, nil)
 			w := httptest.NewRecorder()
 
