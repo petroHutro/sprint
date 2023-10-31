@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 	"sprint/internal/logger"
 	"sprint/internal/storage"
@@ -15,16 +16,16 @@ func HandlerGet(w http.ResponseWriter, r *http.Request, db *storage.StorageBase)
 	}
 	link, err := db.ShortToLong(r.Context(), shortLink)
 	if err != nil {
+		if err == errors.New("url delete") {
+			logger.Error("link alrege delete:%v", err)
+			w.WriteHeader(http.StatusGone)
+			return
+		}
 		logger.Error("cannot convert short to long :%v", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	if link == "-1" {
-		logger.Error("link alrege delete:%v", err)
-		w.WriteHeader(http.StatusGone)
-		return
-	}
 	w.Header().Set("Location", link)
 	w.WriteHeader(http.StatusTemporaryRedirect)
 }

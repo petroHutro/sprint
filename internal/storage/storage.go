@@ -5,19 +5,16 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"time"
 )
 
 type URL struct {
 	LongURL  string `json:"long"`
 	ShortURL string `json:"short"`
-	// UserID   int    `json:"user"`
-	UserID  string `json:"user"`
-	FlagDel bool   `json:"del"`
+	UserID   string `json:"user"`
+	FlagDel  bool   `json:"del"`
 }
 
 type QueryDelete struct {
-	// ID   int
 	ID   string
 	Data string
 }
@@ -41,20 +38,22 @@ type base interface {
 	delete(ctx context.Context, id []string, shorts []string) error
 }
 
-func (s *StorageBase) PingDB() error {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
-	defer cancel()
-
-	if s != nil {
-		if _, ok := s.base.(*dataBase); ok {
-			db := s.get()
-			if err := db.PingContext(ctx); err != nil {
-				return fmt.Errorf("cannot ping: %w", err)
+func (s *StorageBase) PingDB(ctx context.Context) error {
+	select {
+	case <-ctx.Done():
+		return errors.New("context cansel")
+	default:
+		if s != nil {
+			if _, ok := s.base.(*dataBase); ok {
+				db := s.get()
+				if err := db.PingContext(ctx); err != nil {
+					return fmt.Errorf("cannot ping: %w", err)
+				}
+				return nil
 			}
-			return nil
 		}
+		return errors.New("not flag database, database empty")
 	}
-	return errors.New("not flag database, database empty")
 }
 
 func Connection(databaseDSN string) (*sql.DB, error) {
@@ -66,17 +65,22 @@ func Connection(databaseDSN string) (*sql.DB, error) {
 }
 
 func (s *StorageBase) DeleteURL(ctx context.Context, fname string, id []string, shorts []string) error {
-	err := s.delete(ctx, id, shorts)
-	if err != nil {
-		return fmt.Errorf("cannot deleta: %w", err)
-	}
-
-	if fname != "" {
-		urls, err := s.GetAll(ctx)
+	select {
+	case <-ctx.Done():
+		return errors.New("context cansel")
+	default:
+		err := s.delete(ctx, id, shorts)
 		if err != nil {
-			return fmt.Errorf("cannot get all: %w", err)
+			return fmt.Errorf("cannot deleta: %w", err)
 		}
-		saveURLs(urls, fname)
+
+		if fname != "" {
+			urls, err := s.GetAll(ctx)
+			if err != nil {
+				return fmt.Errorf("cannot get all: %w", err)
+			}
+			saveURLs(urls, fname)
+		}
+		return nil
 	}
-	return nil
 }

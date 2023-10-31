@@ -9,9 +9,8 @@ import (
 )
 
 type memeryBase struct {
-	dbSL map[string]string
-	dbLS map[string]string
-	// dbLID map[string]int
+	dbSL  map[string]string
+	dbLS  map[string]string
 	dbLID map[string]string
 	dbLF  map[string]bool
 	sm    sync.Mutex
@@ -33,7 +32,12 @@ func (m *memeryBase) GetShort(ctx context.Context, key string) (string, error) {
 	default:
 		m.sm.Lock()
 		defer m.sm.Unlock()
-		return m.dbLS[key], nil
+
+		value, ok := m.dbLS[key]
+		if ok {
+			return value, nil
+		}
+		return "", errors.New("no long")
 	}
 }
 
@@ -44,13 +48,14 @@ func (m *memeryBase) GetLong(ctx context.Context, key string) (string, error) {
 	default:
 		m.sm.Lock()
 		defer m.sm.Unlock()
+
 		if long, ok := m.dbSL[key]; ok {
 			if m.dbLF[long] {
-				return "-1", nil
+				return "", errors.New("url delete")
 			}
 			return long, nil
 		}
-		return "", nil
+		return "", errors.New("not key")
 	}
 }
 
@@ -73,38 +78,54 @@ func (m *memeryBase) Set(ctx context.Context, key, val string, id string, flag b
 }
 
 func (m *memeryBase) SetAll(ctx context.Context, data []string, id string) error {
-	repetition := false
-	for _, v := range data {
-		shortLink := utils.GenerateString()
-		err := m.Set(ctx, v, shortLink, id, false)
-		if err != nil {
-			var repErr *RepError
-			if errors.As(err, &repErr) {
-				repetition = true
-			} else {
-				return fmt.Errorf("cannot set: %w", err)
+	select {
+	case <-ctx.Done():
+		return errors.New("context cansel")
+	default:
+		repetition := false
+
+		for _, v := range data {
+			shortLink := utils.GenerateString()
+			err := m.Set(ctx, v, shortLink, id, false)
+			if err != nil {
+				var repErr *RepError
+				if errors.As(err, &repErr) {
+					repetition = true
+				} else {
+					return fmt.Errorf("cannot set: %w", err)
+				}
 			}
 		}
+		if repetition {
+			return NewErrorRep(errors.New("long already db"), repetition)
+		}
+		return nil
 	}
-	if repetition {
-		return NewErrorRep(errors.New("long already db"), repetition)
-	}
-	return nil
 }
 
 func (m *memeryBase) GetAllID(ctx context.Context, id string) ([]Urls, error) {
-	var urls []Urls
+	select {
+	case <-ctx.Done():
+		return nil, errors.New("context cansel")
+	default:
+		m.sm.Lock()
+		defer m.sm.Unlock()
 
-	for key, val := range m.dbLID {
-		if val == id {
-			short, _ := m.GetShort(ctx, key) //!!!!!!!!!!!!!!!!!!!!!!!!!
-			urls = append(urls, Urls{Long: key, Short: short})
+		var urls []Urls
+		for key, val := range m.dbLID {
+			if val == id {
+				short, err := m.GetShort(ctx, key)
+				if err != nil {
+					return nil, fmt.Errorf("cannot get: %w", err)
+				}
+				urls = append(urls, Urls{Long: key, Short: short})
+			}
 		}
+		if urls == nil {
+			return nil, errors.New("no data on id")
+		}
+		return urls, nil
 	}
-	if urls == nil {
-		return nil, errors.New("no data on id")
-	}
-	return urls, nil
 }
 
 func (m *memeryBase) GetAll(ctx context.Context) ([]URL, error) {
@@ -114,9 +135,13 @@ func (m *memeryBase) GetAll(ctx context.Context) ([]URL, error) {
 	default:
 		m.sm.Lock()
 		defer m.sm.Unlock()
+
 		var urls []URL
 		for key, el := range m.dbLS {
 			urls = append(urls, URL{LongURL: key, ShortURL: el, UserID: m.dbLID[key], FlagDel: m.dbLF[key]})
+		}
+		if urls == nil {
+			return nil, errors.New("storage is empty")
 		}
 		return urls, nil
 	}
