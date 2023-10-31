@@ -131,7 +131,7 @@ func (d *dataBase) SetAll(ctx context.Context, data []string, id string) error {
 	}
 
 	if repetition {
-		return NewErrorRep(errors.New("long already db"), repetition)
+		return NewErrorRep(ErrorSet, repetition)
 	}
 
 	return nil

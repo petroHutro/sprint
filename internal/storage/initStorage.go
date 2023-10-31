@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"sprint/internal/config"
 	"time"
@@ -37,15 +38,18 @@ func (s *StorageBase) createTable(ctx context.Context) error {
 	}
 
 	// _, _ = tx.ExecContext(ctx, `
-	// 		ALTER TABLE links
-	// 		ADD user INT NOT NULL;
-	// `)
-
-	// _, _ = tx.ExecContext(ctx, `
 	// 	DROP TABLE links ;
 	// `)
 
 	return tx.Commit()
+}
+
+func Connection(databaseDSN string) (*sql.DB, error) {
+	db, err := sql.Open("pgx", databaseDSN)
+	if err != nil {
+		return nil, fmt.Errorf("cannot open DataBase: %w", err)
+	}
+	return db, nil
 }
 
 func InitStorage(conf *config.Storage) (*StorageBase, error) {

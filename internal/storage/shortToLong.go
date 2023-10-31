@@ -9,7 +9,7 @@ import (
 func (s *StorageBase) ShortToLong(ctx context.Context, shortLink string) (string, error) {
 	select {
 	case <-ctx.Done():
-		return "", errors.New("context cansel")
+		return "", ErrorContext
 	default:
 		el, err := s.GetLong(ctx, shortLink)
 		if el != "" && err == nil {

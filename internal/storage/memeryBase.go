@@ -28,7 +28,7 @@ func newMemeryBase() *memeryBase {
 func (m *memeryBase) GetShort(ctx context.Context, key string) (string, error) {
 	select {
 	case <-ctx.Done():
-		return "", errors.New("context cansel")
+		return "", ErrorContext
 	default:
 		m.sm.Lock()
 		defer m.sm.Unlock()
@@ -37,14 +37,14 @@ func (m *memeryBase) GetShort(ctx context.Context, key string) (string, error) {
 		if ok {
 			return value, nil
 		}
-		return "", errors.New("no long")
+		return "", ErrorNoGet
 	}
 }
 
 func (m *memeryBase) GetLong(ctx context.Context, key string) (string, error) {
 	select {
 	case <-ctx.Done():
-		return "", errors.New("context cansel")
+		return "", ErrorContext
 	default:
 		m.sm.Lock()
 		defer m.sm.Unlock()
@@ -55,14 +55,14 @@ func (m *memeryBase) GetLong(ctx context.Context, key string) (string, error) {
 			}
 			return long, nil
 		}
-		return "", errors.New("not key")
+		return "", ErrorNoGet
 	}
 }
 
 func (m *memeryBase) Set(ctx context.Context, key, val string, id string, flag bool) error {
 	select {
 	case <-ctx.Done():
-		return errors.New("context cansel")
+		return ErrorContext
 	default:
 		m.sm.Lock()
 		defer m.sm.Unlock()
@@ -73,14 +73,14 @@ func (m *memeryBase) Set(ctx context.Context, key, val string, id string, flag b
 			m.dbLF[key] = flag
 			return nil
 		}
-		return &RepError{Err: errors.New("key already DB"), Repetition: true}
+		return &RepError{Err: ErrorSet, Repetition: true}
 	}
 }
 
 func (m *memeryBase) SetAll(ctx context.Context, data []string, id string) error {
 	select {
 	case <-ctx.Done():
-		return errors.New("context cansel")
+		return ErrorContext
 	default:
 		repetition := false
 
@@ -97,7 +97,7 @@ func (m *memeryBase) SetAll(ctx context.Context, data []string, id string) error
 			}
 		}
 		if repetition {
-			return NewErrorRep(errors.New("long already db"), repetition)
+			return NewErrorRep(ErrorSet, repetition)
 		}
 		return nil
 	}
@@ -106,7 +106,7 @@ func (m *memeryBase) SetAll(ctx context.Context, data []string, id string) error
 func (m *memeryBase) GetAllID(ctx context.Context, id string) ([]Urls, error) {
 	select {
 	case <-ctx.Done():
-		return nil, errors.New("context cansel")
+		return nil, ErrorContext
 	default:
 		m.sm.Lock()
 		defer m.sm.Unlock()
@@ -116,7 +116,7 @@ func (m *memeryBase) GetAllID(ctx context.Context, id string) ([]Urls, error) {
 			if val == id {
 				short, ok := m.dbLS[key]
 				if !ok {
-					return nil, fmt.Errorf("cannot get: %w", errors.New("no long"))
+					return nil, fmt.Errorf("cannot get: %w", ErrorNoGet)
 				}
 				if !m.dbLF[key] {
 					urls = append(urls, Urls{Long: key, Short: short})
@@ -124,7 +124,7 @@ func (m *memeryBase) GetAllID(ctx context.Context, id string) ([]Urls, error) {
 			}
 		}
 		if urls == nil {
-			return nil, errors.New("no data on id")
+			return nil, fmt.Errorf("no data on id: %w", ErrorNoGet)
 		}
 		return urls, nil
 	}
@@ -133,7 +133,7 @@ func (m *memeryBase) GetAllID(ctx context.Context, id string) ([]Urls, error) {
 func (m *memeryBase) GetAll(ctx context.Context) ([]URL, error) {
 	select {
 	case <-ctx.Done():
-		return nil, errors.New("context cansel")
+		return nil, ErrorContext
 	default:
 		m.sm.Lock()
 		defer m.sm.Unlock()
@@ -152,7 +152,7 @@ func (m *memeryBase) GetAll(ctx context.Context) ([]URL, error) {
 func (m *memeryBase) delete(ctx context.Context, id []string, shorts []string) error {
 	select {
 	case <-ctx.Done():
-		return errors.New("context cansel")
+		return ErrorContext
 	default:
 		m.sm.Lock()
 		defer m.sm.Unlock()
