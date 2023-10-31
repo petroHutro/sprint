@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"errors"
 	"net/http"
 	"sprint/internal/logger"
 	"sprint/internal/storage"
@@ -16,7 +15,7 @@ func HandlerGet(w http.ResponseWriter, r *http.Request, db *storage.StorageBase)
 	}
 	link, err := db.ShortToLong(r.Context(), shortLink)
 	if err != nil {
-		if err == errors.New("url delete") {
+		if err == storage.ErrorDeleteURL {
 			logger.Error("link alrege delete:%v", err)
 			w.WriteHeader(http.StatusGone)
 			return

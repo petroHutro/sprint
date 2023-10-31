@@ -7,6 +7,8 @@ import (
 	"fmt"
 )
 
+var ErrorDeleteURL = errors.New("url delete")
+
 type URL struct {
 	LongURL  string `json:"long"`
 	ShortURL string `json:"short"`

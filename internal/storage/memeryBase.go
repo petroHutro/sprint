@@ -51,7 +51,7 @@ func (m *memeryBase) GetLong(ctx context.Context, key string) (string, error) {
 
 		if long, ok := m.dbSL[key]; ok {
 			if m.dbLF[long] {
-				return "", errors.New("url delete")
+				return "", ErrorDeleteURL
 			}
 			return long, nil
 		}

@@ -142,9 +142,9 @@ func (d *dataBase) GetAllID(ctx context.Context, id string) ([]Urls, error) {
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, err //!!!! проверка на пусто
+			return nil, fmt.Errorf("db emty: %w", err)
 		}
-		return nil, err
+		return nil, fmt.Errorf("cannot query: %w", err)
 	}
 	defer rows.Close()
 
@@ -154,7 +154,7 @@ func (d *dataBase) GetAllID(ctx context.Context, id string) ([]Urls, error) {
 		var long, short string
 
 		if err := rows.Scan(&long, &short); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("cannot scan: %w", err)
 		}
 
 		urls = append(urls, Urls{
@@ -164,9 +164,8 @@ func (d *dataBase) GetAllID(ctx context.Context, id string) ([]Urls, error) {
 	}
 
 	if err := rows.Err(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannot convert: %w", err)
 	}
-
 	return urls, nil
 }
 
@@ -175,9 +174,9 @@ func (d *dataBase) GetAll(ctx context.Context) ([]URL, error) {
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, err //!!!! проверка на пусто
+			return nil, fmt.Errorf("db emty: %w", err)
 		}
-		return nil, err
+		return nil, fmt.Errorf("cannot query: %w", err)
 	}
 	defer rows.Close()
 
@@ -185,12 +184,11 @@ func (d *dataBase) GetAll(ctx context.Context) ([]URL, error) {
 
 	for rows.Next() {
 		var long, short string
-		// var userID int
 		var userID string
 		var del bool
 
-		if err := rows.Scan(&long, &short, userID, del); err != nil {
-			return nil, err
+		if err := rows.Scan(&long, &short, &userID, &del); err != nil {
+			return nil, fmt.Errorf("cannot scan: %w", err)
 		}
 
 		urls = append(urls, URL{
@@ -202,9 +200,8 @@ func (d *dataBase) GetAll(ctx context.Context) ([]URL, error) {
 	}
 
 	if err := rows.Err(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannot convert: %w", err)
 	}
-
 	return urls, nil
 }
 
