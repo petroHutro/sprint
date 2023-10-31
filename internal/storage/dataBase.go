@@ -58,10 +58,10 @@ func (d *dataBase) GetLong(ctx context.Context, key string) (string, error) {
 	var deleted bool
 	err := row.Scan(&long, &deleted)
 	if err != nil {
-		return "", nil
+		return "", fmt.Errorf("cannot scan: %w", err)
 	}
 	if deleted {
-		return "-1", nil
+		return "", ErrorDeleteURL
 	}
 	return long, nil
 }
@@ -75,7 +75,7 @@ func (d *dataBase) GetShort(ctx context.Context, key string) (string, error) {
 	var short string
 	err := row.Scan(&short)
 	if err != nil {
-		return "", nil
+		return "", fmt.Errorf("cannot scan: %w", err)
 	}
 	return short, nil
 }
