@@ -3,6 +3,7 @@ package storage
 import (
 	"context"
 	"errors"
+	"fmt"
 )
 
 func (s *StorageBase) ShortToLong(ctx context.Context, shortLink string) (string, error) {
@@ -10,8 +11,11 @@ func (s *StorageBase) ShortToLong(ctx context.Context, shortLink string) (string
 	case <-ctx.Done():
 		return "", errors.New("context cansel")
 	default:
-		if el, err := s.GetLong(ctx, shortLink); el != "" && err == nil {
+		el, err := s.GetLong(ctx, shortLink)
+		if el != "" && err == nil {
 			return el, nil
+		} else if err != nil {
+			return "", fmt.Errorf("cannot get: %w", err)
 		}
 		return "", errors.New("no short link")
 	}
