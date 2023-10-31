@@ -18,8 +18,8 @@ func HandlerPost(w http.ResponseWriter, r *http.Request, baseAddress, file strin
 	defer r.Body.Close()
 	// id, err := strconv.Atoi(r.Header.Get("User_id"))
 	id := r.Header.Get("User_id")
-	if id != "" {
-		logger.Error("bad user id: %v", err)
+	if id == "" {
+		logger.Error("bad user id")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
