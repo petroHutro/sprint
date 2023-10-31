@@ -32,11 +32,11 @@ type baseWithPointer interface {
 type base interface {
 	GetShort(ctx context.Context, key string) (string, error)
 	GetLong(ctx context.Context, key string) (string, error)
-	SetDB(ctx context.Context, key, val string, id int, flag bool) error
-	SetAllDB(ctx context.Context, data []string, id int) error
-	GetAllDB(ctx context.Context, id int) ([]Urls, error)
-	GetLastID(ctx context.Context) int
-	DeleteS(ctx context.Context, id []int, shorts []string) error
+	Set(ctx context.Context, key, val string, id int, flag bool) error
+	SetAll(ctx context.Context, data []string, id int) error
+	GetAllId(ctx context.Context, id int) ([]Urls, error)
+	GetAll(ctx context.Context) ([]URL, error)
+	delete(ctx context.Context, id []int, shorts []string) error
 }
 
 func (s *StorageBase) PingDB() error {
@@ -61,4 +61,20 @@ func Connection(databaseDSN string) (*sql.DB, error) {
 		return nil, fmt.Errorf("cannot open DataBase: %w", err)
 	}
 	return db, nil
+}
+
+func (s *StorageBase) DeleteURL(ctx context.Context, fname string, id []int, shorts []string) error {
+	err := s.delete(ctx, id, shorts)
+	if err != nil {
+		return fmt.Errorf("cannot deleta: %w", err)
+	}
+
+	if fname != "" {
+		urls, err := s.GetAll(ctx)
+		if err != nil {
+			return fmt.Errorf("cannot get all: %w", err)
+		}
+		saveURLs(urls, fname)
+	}
+	return nil
 }

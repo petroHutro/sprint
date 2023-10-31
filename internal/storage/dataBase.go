@@ -81,7 +81,7 @@ func (d *dataBase) GetShort(ctx context.Context, key string) (string, error) {
 	return short, nil
 }
 
-func (d *dataBase) SetDB(ctx context.Context, key, val string, id int, flag bool) error {
+func (d *dataBase) Set(ctx context.Context, key, val string, id int, flag bool) error {
 	_, err := d.db.ExecContext(ctx, `
 		INSERT INTO links
 		(long, short, user_id, deleted)
@@ -99,7 +99,7 @@ func (d *dataBase) SetDB(ctx context.Context, key, val string, id int, flag bool
 	return nil
 }
 
-func (d *dataBase) SetAllDB(ctx context.Context, data []string, id int) error {
+func (d *dataBase) SetAll(ctx context.Context, data []string, id int) error {
 	repetition := false
 	tx, err := d.db.Begin()
 	if err != nil {
@@ -138,7 +138,7 @@ func (d *dataBase) SetAllDB(ctx context.Context, data []string, id int) error {
 	return nil
 }
 
-func (d *dataBase) GetAllDB(ctx context.Context, id int) ([]Urls, error) {
+func (d *dataBase) GetAllId(ctx context.Context, id int) ([]Urls, error) {
 	rows, err := d.db.QueryContext(ctx, "SELECT long, short FROM links WHERE user_id = $1", id)
 
 	if err != nil {
@@ -171,19 +171,44 @@ func (d *dataBase) GetAllDB(ctx context.Context, id int) ([]Urls, error) {
 	return urls, nil
 }
 
-func (d *dataBase) GetLastID(ctx context.Context) int {
-	row := d.db.QueryRowContext(ctx, `
-		SELECT MAX(user_id) FROM links`)
+func (d *dataBase) GetAll(ctx context.Context) ([]URL, error) {
+	rows, err := d.db.QueryContext(ctx, "SELECT long, short, user_id, deleted FROM links")
 
-	var userID int
-	err := row.Scan(&userID)
 	if err != nil {
-		return -1
+		if err == sql.ErrNoRows {
+			return nil, err //!!!! проверка на пусто
+		}
+		return nil, err
 	}
-	return userID
+	defer rows.Close()
+
+	var urls []URL
+
+	for rows.Next() {
+		var long, short string
+		var user_id int
+		var del bool
+
+		if err := rows.Scan(&long, &short); err != nil {
+			return nil, err
+		}
+
+		urls = append(urls, URL{
+			LongURL:  long,
+			ShortURL: short,
+			UserID:   user_id,
+			FlagDel:  del,
+		})
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return urls, nil
 }
 
-func (d *dataBase) DeleteS(ctx context.Context, id []int, shorts []string) error {
+func (d *dataBase) delete(ctx context.Context, id []int, shorts []string) error {
 	_, err := d.db.ExecContext(ctx, `
 		UPDATE links
 			SET deleted = CASE

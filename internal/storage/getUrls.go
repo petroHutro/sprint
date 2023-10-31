@@ -10,9 +10,11 @@ type Urls struct {
 }
 
 func (s *StorageBase) GetUrls(ctx context.Context, userID int) ([]Urls, error) {
-	urls, err := s.GetAllDB(ctx, userID)
+	urls, err := s.GetAllId(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
 	return urls, nil
 }
+
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

@@ -32,14 +32,12 @@ func (a *App) FlushDelete() {
 	for {
 		select {
 		case request := <-a.delQueryChan:
-			// fmt.Println("!", request)
 			requests = append(requests, request)
 		case <-ticker.C:
 			if len(requests) == 0 {
 				continue
 			}
 			go func(requests []storage.QueryDelete) {
-				// fmt.Println(requests)
 				var id []int
 				var data []string
 
@@ -48,11 +46,10 @@ func (a *App) FlushDelete() {
 					data = append(data, request.Data)
 				}
 
-				err := a.db.DeleteS(context.Background(), id, data)
+				err := a.db.DeleteURL(context.Background(), a.conf.FilePath, id, data)
 				if err != nil {
 					logger.Error("cannot delete:%v", err)
 				}
-				// fmt.Println("err:", err)
 			}(requests)
 			requests = nil
 		}

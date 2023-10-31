@@ -53,7 +53,7 @@ func (m *memeryBase) GetLong(ctx context.Context, key string) (string, error) {
 	}
 }
 
-func (m *memeryBase) SetDB(ctx context.Context, key, val string, id int, flag bool) error {
+func (m *memeryBase) Set(ctx context.Context, key, val string, id int, flag bool) error {
 	select {
 	case <-ctx.Done():
 		return errors.New("context cansel")
@@ -71,11 +71,11 @@ func (m *memeryBase) SetDB(ctx context.Context, key, val string, id int, flag bo
 	}
 }
 
-func (m *memeryBase) SetAllDB(ctx context.Context, data []string, id int) error {
+func (m *memeryBase) SetAll(ctx context.Context, data []string, id int) error {
 	repetition := false
 	for _, v := range data {
 		shortLink := utils.GetShortLink()
-		err := m.SetDB(ctx, v, shortLink, id, false)
+		err := m.Set(ctx, v, shortLink, id, false)
 		if err != nil {
 			var repErr *RepError
 			if errors.As(err, &repErr) {
@@ -91,7 +91,7 @@ func (m *memeryBase) SetAllDB(ctx context.Context, data []string, id int) error 
 	return nil
 }
 
-func (m *memeryBase) GetAllDB(ctx context.Context, id int) ([]Urls, error) {
+func (m *memeryBase) GetAllId(ctx context.Context, id int) ([]Urls, error) {
 	var urls []Urls
 
 	for key, val := range m.dbLID {
@@ -103,18 +103,22 @@ func (m *memeryBase) GetAllDB(ctx context.Context, id int) ([]Urls, error) {
 	return urls, nil
 }
 
-func (m *memeryBase) GetLastID(ctx context.Context) int {
-	max := -1
-
-	for _, val := range m.dbLID {
-		if val > max {
-			max = val
+func (m *memeryBase) GetAll(ctx context.Context) ([]URL, error) {
+	select {
+	case <-ctx.Done():
+		return nil, errors.New("context cansel")
+	default:
+		m.sm.Lock()
+		defer m.sm.Unlock()
+		var urls []URL
+		for key, el := range m.dbLS {
+			urls = append(urls, URL{LongURL: key, ShortURL: el, UserID: m.dbLID[key], FlagDel: m.dbLF[key]})
 		}
+		return urls, nil
 	}
-	return max
 }
 
-func (m *memeryBase) DeleteS(ctx context.Context, id []int, shorts []string) error {
+func (m *memeryBase) delete(ctx context.Context, id []int, shorts []string) error {
 	select {
 	case <-ctx.Done():
 		return errors.New("context cansel")

@@ -55,7 +55,7 @@ func HandlerPostBatch(w http.ResponseWriter, r *http.Request, baseAddress, file 
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	if err := db.SetAllDB(r.Context(), longs, id); err != nil {
+	if err := db.SetAll(r.Context(), longs, id); err != nil {
 		var repErr *storage.RepError
 		if errors.As(err, &repErr) && repErr.Repetition {
 			statusCode = http.StatusConflict
