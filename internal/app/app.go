@@ -38,7 +38,7 @@ func (a *App) FlushDelete() {
 				continue
 			}
 			go func(requests []storage.QueryDelete) {
-				var id []int
+				var id []string
 				var data []string
 
 				for _, request := range requests {

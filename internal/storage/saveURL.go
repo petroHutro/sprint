@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func saveURL(long, short, fname string, id int, flagDel bool) error {
+func saveURL(long, short, fname string, id string, flagDel bool) error {
 	file, err := os.OpenFile(fname, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		return fmt.Errorf("cannot open file: %w", err)

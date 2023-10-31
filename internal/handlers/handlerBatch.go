@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"sprint/internal/logger"
 	"sprint/internal/storage"
-	"strconv"
 )
 
 type DataReqBatch struct {
@@ -49,7 +48,8 @@ func HandlerPostBatch(w http.ResponseWriter, r *http.Request, baseAddress, file 
 	}
 
 	statusCode := http.StatusCreated
-	id, err := strconv.Atoi(r.Header.Get("User_id"))
+	// id, err := strconv.Atoi(r.Header.Get("User_id"))
+	id := r.Header.Get("User_id")
 	if err != nil {
 		logger.Error("bad user id: %v", err)
 		w.WriteHeader(http.StatusBadRequest)

@@ -10,8 +10,8 @@ type Urls struct {
 	Long  string
 }
 
-func (s *StorageBase) GetUrls(ctx context.Context, userID int) ([]Urls, error) {
-	urls, err := s.GetAllId(ctx, userID)
+func (s *StorageBase) GetUrls(ctx context.Context, userID string) ([]Urls, error) {
+	urls, err := s.GetAllID(ctx, userID)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get urls: %v", err)
 	}

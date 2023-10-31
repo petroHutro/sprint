@@ -60,7 +60,6 @@ func (d *dataBase) GetLong(ctx context.Context, key string) (string, error) {
 	if err != nil {
 		return "", nil
 	}
-	// fmt.Println(key, long, deleted)
 	if deleted {
 		return "-1", nil
 	}
@@ -81,7 +80,7 @@ func (d *dataBase) GetShort(ctx context.Context, key string) (string, error) {
 	return short, nil
 }
 
-func (d *dataBase) Set(ctx context.Context, key, val string, id int, flag bool) error {
+func (d *dataBase) Set(ctx context.Context, key, val string, id string, flag bool) error {
 	_, err := d.db.ExecContext(ctx, `
 		INSERT INTO links
 		(long, short, user_id, deleted)
@@ -99,7 +98,7 @@ func (d *dataBase) Set(ctx context.Context, key, val string, id int, flag bool) 
 	return nil
 }
 
-func (d *dataBase) SetAll(ctx context.Context, data []string, id int) error {
+func (d *dataBase) SetAll(ctx context.Context, data []string, id string) error {
 	repetition := false
 	tx, err := d.db.Begin()
 	if err != nil {
@@ -107,7 +106,7 @@ func (d *dataBase) SetAll(ctx context.Context, data []string, id int) error {
 	}
 
 	for _, v := range data {
-		shortLink := utils.GetShortLink()
+		shortLink := utils.GenerateString()
 		_, err := tx.ExecContext(ctx, `
 			INSERT INTO links
 			(long, short, user_id, deleted)
@@ -138,7 +137,7 @@ func (d *dataBase) SetAll(ctx context.Context, data []string, id int) error {
 	return nil
 }
 
-func (d *dataBase) GetAllId(ctx context.Context, id int) ([]Urls, error) {
+func (d *dataBase) GetAllID(ctx context.Context, id string) ([]Urls, error) {
 	rows, err := d.db.QueryContext(ctx, "SELECT long, short FROM links WHERE user_id = $1", id)
 
 	if err != nil {
@@ -186,7 +185,8 @@ func (d *dataBase) GetAll(ctx context.Context) ([]URL, error) {
 
 	for rows.Next() {
 		var long, short string
-		var userID int
+		// var userID int
+		var userID string
 		var del bool
 
 		if err := rows.Scan(&long, &short); err != nil {
@@ -208,7 +208,7 @@ func (d *dataBase) GetAll(ctx context.Context) ([]URL, error) {
 	return urls, nil
 }
 
-func (d *dataBase) delete(ctx context.Context, id []int, shorts []string) error {
+func (d *dataBase) delete(ctx context.Context, id []string, shorts []string) error {
 	_, err := d.db.ExecContext(ctx, `
 		UPDATE links
 			SET deleted = CASE

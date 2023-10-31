@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"sprint/internal/logger"
 	"sprint/internal/storage"
-	"strconv"
 )
 
 type Data []string
@@ -28,8 +27,8 @@ func HandlerDelete(w http.ResponseWriter, r *http.Request, delChan chan storage.
 		return
 	}
 
-	userID := r.Header.Get("User_id")
-	id, _ := strconv.Atoi(userID)
+	id := r.Header.Get("User_id")
+	// id, _ := strconv.Atoi(userID)
 
 	for _, short := range data {
 		delChan <- storage.QueryDelete{ID: id, Data: short}

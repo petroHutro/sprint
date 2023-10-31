@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"sprint/internal/logger"
 	"sprint/internal/storage"
-	"strconv"
 )
 
 type RespGetUrls struct {
@@ -20,8 +19,9 @@ func HandlerGetUrls(w http.ResponseWriter, r *http.Request, baseAddress string, 
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
-	userID := r.Header.Get("User_id")
-	id, _ := strconv.Atoi(userID)
+	// userID := r.Header.Get("User_id")
+	// id, _ := strconv.Atoi(userID)
+	id := r.Header.Get("User_id")
 
 	urls, err := db.GetUrls(r.Context(), id)
 	if err != nil {

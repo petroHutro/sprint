@@ -11,12 +11,14 @@ import (
 type URL struct {
 	LongURL  string `json:"long"`
 	ShortURL string `json:"short"`
-	UserID   int    `json:"user"`
-	FlagDel  bool   `json:"del"`
+	// UserID   int    `json:"user"`
+	UserID  string `json:"user"`
+	FlagDel bool   `json:"del"`
 }
 
 type QueryDelete struct {
-	ID   int
+	// ID   int
+	ID   string
 	Data string
 }
 
@@ -32,11 +34,11 @@ type baseWithPointer interface {
 type base interface {
 	GetShort(ctx context.Context, key string) (string, error)
 	GetLong(ctx context.Context, key string) (string, error)
-	Set(ctx context.Context, key, val string, id int, flag bool) error
-	SetAll(ctx context.Context, data []string, id int) error
-	GetAllId(ctx context.Context, id int) ([]Urls, error)
+	Set(ctx context.Context, key, val string, id string, flag bool) error
+	SetAll(ctx context.Context, data []string, id string) error
+	GetAllID(ctx context.Context, id string) ([]Urls, error)
 	GetAll(ctx context.Context) ([]URL, error)
-	delete(ctx context.Context, id []int, shorts []string) error
+	delete(ctx context.Context, id []string, shorts []string) error
 }
 
 func (s *StorageBase) PingDB() error {
@@ -63,7 +65,7 @@ func Connection(databaseDSN string) (*sql.DB, error) {
 	return db, nil
 }
 
-func (s *StorageBase) DeleteURL(ctx context.Context, fname string, id []int, shorts []string) error {
+func (s *StorageBase) DeleteURL(ctx context.Context, fname string, id []string, shorts []string) error {
 	err := s.delete(ctx, id, shorts)
 	if err != nil {
 		return fmt.Errorf("cannot deleta: %w", err)

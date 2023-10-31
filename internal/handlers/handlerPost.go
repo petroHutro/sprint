@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"sprint/internal/logger"
 	"sprint/internal/storage"
-	"strconv"
 )
 
 func HandlerPost(w http.ResponseWriter, r *http.Request, baseAddress, file string, db *storage.StorageBase) {
@@ -17,8 +16,9 @@ func HandlerPost(w http.ResponseWriter, r *http.Request, baseAddress, file strin
 		return
 	}
 	defer r.Body.Close()
-	id, err := strconv.Atoi(r.Header.Get("User_id"))
-	if err != nil {
+	// id, err := strconv.Atoi(r.Header.Get("User_id"))
+	id := r.Header.Get("User_id")
+	if id != "" {
 		logger.Error("bad user id: %v", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return

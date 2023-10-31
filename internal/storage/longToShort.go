@@ -7,8 +7,8 @@ import (
 	"sprint/internal/utils"
 )
 
-func (s *StorageBase) LongToShort(ctx context.Context, link, fname string, id int) error {
-	shortLink := utils.GetShortLink()
+func (s *StorageBase) LongToShort(ctx context.Context, link, fname string, id string) error {
+	shortLink := utils.GenerateString()
 	if err := s.Set(ctx, link, shortLink, id, false); err != nil {
 		var repErr *RepError
 		if errors.As(err, &repErr) && repErr.Repetition {
