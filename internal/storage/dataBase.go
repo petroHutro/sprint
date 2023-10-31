@@ -186,7 +186,7 @@ func (d *dataBase) GetAll(ctx context.Context) ([]URL, error) {
 
 	for rows.Next() {
 		var long, short string
-		var user_id int
+		var userID int
 		var del bool
 
 		if err := rows.Scan(&long, &short); err != nil {
@@ -196,7 +196,7 @@ func (d *dataBase) GetAll(ctx context.Context) ([]URL, error) {
 		urls = append(urls, URL{
 			LongURL:  long,
 			ShortURL: short,
-			UserID:   user_id,
+			UserID:   userID,
 			FlagDel:  del,
 		})
 	}

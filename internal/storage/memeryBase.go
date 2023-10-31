@@ -28,7 +28,7 @@ func newMemeryBase() *memeryBase {
 func (m *memeryBase) GetShort(ctx context.Context, key string) (string, error) {
 	select {
 	case <-ctx.Done():
-		return "", nil
+		return "", errors.New("context cansel")
 	default:
 		m.sm.Lock()
 		defer m.sm.Unlock()
@@ -39,7 +39,7 @@ func (m *memeryBase) GetShort(ctx context.Context, key string) (string, error) {
 func (m *memeryBase) GetLong(ctx context.Context, key string) (string, error) {
 	select {
 	case <-ctx.Done():
-		return "", nil
+		return "", errors.New("context cansel")
 	default:
 		m.sm.Lock()
 		defer m.sm.Unlock()
@@ -99,6 +99,9 @@ func (m *memeryBase) GetAllId(ctx context.Context, id int) ([]Urls, error) {
 			short, _ := m.GetShort(ctx, key) //!!!!!!!!!!!!!!!!!!!!!!!!!
 			urls = append(urls, Urls{Long: key, Short: short})
 		}
+	}
+	if urls == nil {
+		return nil, errors.New("no data on id")
 	}
 	return urls, nil
 }

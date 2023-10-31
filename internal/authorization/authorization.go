@@ -33,7 +33,7 @@ func buildJWTString() (string, error) {
 
 	tokenString, err := token.SignedString([]byte(SecretKey))
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("cannot get token: %v", err)
 	}
 
 	return tokenString, nil
@@ -59,10 +59,11 @@ func getUserID(tokenString string) (int, error) {
 	return claims.UserID, nil
 }
 
-func setAuthorization(w *http.ResponseWriter) {
+func setAuthorization(w *http.ResponseWriter) *http.Cookie {
 	token, _ := buildJWTString()
 	cookie := http.Cookie{Name: "Authorization", Value: token}
 	http.SetCookie(*w, &cookie)
+	return &cookie
 }
 
 func AuthorizationMiddleware(next http.Handler) http.Handler {
@@ -70,19 +71,15 @@ func AuthorizationMiddleware(next http.Handler) http.Handler {
 		cookie, err := r.Cookie("Authorization")
 		if err != nil {
 			logger.Error("cookies do not contain a token: %v", err)
-			token, _ := buildJWTString()
-			cookie = &http.Cookie{Name: "Authorization", Value: token}
-			http.SetCookie(w, cookie)
-			// setAuthorization(&w)
-			// w.WriteHeader(http.StatusUnauthorized)
-			// return
+			// token, _ := buildJWTString()
+			// cookie = &http.Cookie{Name: "Authorization", Value: token}
+			// http.SetCookie(w, cookie)
+			cookie = setAuthorization(&w)
 		}
 		id, err := getUserID(cookie.Value)
 		if err != nil {
 			logger.Error("token does not pass validation")
 			setAuthorization(&w)
-			// w.WriteHeader(http.StatusUnauthorized)
-			// return
 		}
 		r.Header.Set("User_id", strconv.Itoa(id))
 		next.ServeHTTP(w, r)
