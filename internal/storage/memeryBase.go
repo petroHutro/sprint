@@ -114,11 +114,13 @@ func (m *memeryBase) GetAllID(ctx context.Context, id string) ([]Urls, error) {
 		var urls []Urls
 		for key, val := range m.dbLID {
 			if val == id {
-				short, err := m.GetShort(ctx, key)
-				if err != nil {
-					return nil, fmt.Errorf("cannot get: %w", err)
+				short, ok := m.dbLS[key]
+				if !ok {
+					return nil, fmt.Errorf("cannot get: %w", errors.New("no long"))
 				}
-				urls = append(urls, Urls{Long: key, Short: short})
+				if !m.dbLF[key] {
+					urls = append(urls, Urls{Long: key, Short: short})
+				}
 			}
 		}
 		if urls == nil {

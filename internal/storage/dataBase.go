@@ -138,7 +138,7 @@ func (d *dataBase) SetAll(ctx context.Context, data []string, id string) error {
 }
 
 func (d *dataBase) GetAllID(ctx context.Context, id string) ([]Urls, error) {
-	rows, err := d.db.QueryContext(ctx, "SELECT long, short FROM links WHERE user_id = $1", id)
+	rows, err := d.db.QueryContext(ctx, "SELECT long, short FROM links WHERE user_id = $1 AND deleted = false", id)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
